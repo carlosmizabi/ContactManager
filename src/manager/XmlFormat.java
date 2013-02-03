@@ -13,7 +13,7 @@ package manager;
 public class XmlFormat {
 	
 	private static final String xmlSkeleton = 	
-			"<xml>\n" 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" 
 			+
 			"<contactManager>\n"
 			+		
@@ -25,9 +25,7 @@ public class XmlFormat {
 			+		
 			"</meetingList>\n"
 			+
-			"</contactManager>\n"
-			+
-			"</xml>\n";
+			"</contactManager>\n";
 
 	private static final String CONTACT = "contact";
 	private static final String MEETING = "meeting";
