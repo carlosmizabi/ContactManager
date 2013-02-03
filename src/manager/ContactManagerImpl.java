@@ -65,7 +65,7 @@ public class ContactManagerImpl implements ContactManager {
 	 */
 
 	/**
-	* Create a new record for a meeting that took place in the past.
+	* Creates a new record for a meeting that took place in the past.
 	*
 	* @throws IllegalArgumentException if the list of contacts is
 	* empty, or any of the contacts does not exist
@@ -78,14 +78,51 @@ public class ContactManagerImpl implements ContactManager {
 		{
 			throw new IllegalArgumentException("Date is in the Future!");
 		}else{
-			checkIfIsAValidMeeting(contactSet, meetingDate);
-			makeAddMeeting("PAST", contactSet, meetingDate, text);
+			if(checkIfIsAValidMeeting(contactSet, meetingDate) == true)
+			{
+				makeAddMeeting("PAST", contactSet, meetingDate, text);
+			}
 		}
 	}
+	
+	@Override
+	public int addFutureMeeting(Set<Contact> contactSet, Calendar meetingDate) 
+	{
+		if(meetingDate.compareTo(this.date) <= 0) 
+		/*
+		 * for example, 2012 - 2013 = -1. In practice, however,
+		 * any meeting beyond the current time will be in the future.
+		 */
+		{
+			throw new IllegalArgumentException("Date is in the past! To add a occuring meeting create a Past Meeting.");
+		}else{
+			if(checkIfIsAValidMeeting(contactSet, meetingDate) == true)
+			{
+				return makeAddMeeting("FUTURE", contactSet, meetingDate, "").getId();
+			}else{
+				return 0;
+			}
+		}
+	} 
 
+	/**
+	* Adds notes to a meeting.
+	*
+	* This method is used when a future meeting takes place, and is
+	* then converted to a past meeting (with notes).
+	*
+	* It can be also used to add notes to a past meeting at a later date.
+	*
+	* @param id the ID of the meeting
+	* @param text messages to be added about the meeting.
+	* @throws IllegalArgumentException if the meeting does not exist
+	* @throws IllegalStateException if the meeting is set for a date in the future
+	* @throws NullPointerException if the notes are null
+	*/
 	@Override
 	public void addMeetingNotes(int id, String text) 
 	{
+		updateMeetingLists();
 		// TODO Auto-generated method stub
 	}
 
@@ -101,22 +138,18 @@ public class ContactManagerImpl implements ContactManager {
 		}
 	}
 	
-	@Override
-	public int addFutureMeeting(Set<Contact> contactSet, Calendar meetingDate) 
-	{
-		if(meetingDate.compareTo(this.date) < 0) // e.g., 2012 - 2013 = -1
-		{
-			throw new IllegalArgumentException("Date is in the past!");
-		}else{
-			checkIfIsAValidMeeting(contactSet, meetingDate);
-			makeAddMeeting("FUTURE", contactSet, meetingDate, "");
-			return this.meetingCounter;
-		}
-	} 
-	
 	/*
 	 * 3# - +METHODS /////////////////////////////////////////////////////////////////
 	 */
+	
+	/*
+	 * This method will look for meetings in the meeting lists check their dates and transfer
+	 * any meeting that is not longer a future meeting to the past meetings list.
+	 */
+	private void updateMeetingLists()
+	{
+		
+	}
 	
 	/*
 	 * Update the date to current time when using date.
@@ -141,8 +174,8 @@ public class ContactManagerImpl implements ContactManager {
 			//
 			// Do all contacts on the new meeting's set already exist in Mgr's contact list?
 		{
-			throw new IllegalArgumentException("Cannot Add contact list with unknown Contacts!" +
-					"\n" + "Please add them first");
+			throw new IllegalArgumentException("Cannot Add a contact list with unknown Contacts!" +
+					"\n" + "Please add each new contat first");
 		}else
 		{	
 			return true;
