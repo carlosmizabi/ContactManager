@@ -6,35 +6,25 @@ import java.util.Set;
 import interfaces.Contact;
 import interfaces.PastMeeting;
 
-public class PastMeetingImpl implements PastMeeting {
+public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
 	
-	public PastMeetingImpl()
+	String notes = "";
+	
+	public PastMeetingImpl(Set<Contact> contacts, Calendar meetDate, int id, String note)
 	{
-		super();
+		super(contacts, meetDate, id);
+		addNotes(note);
 	}
 
-	@Override
-	public int getId() {
-		// TODO Auto-generated method stub
-		return 0;
+	public void addNotes(String note)
+	{
+		this.notes += "\n" + note;
 	}
-
+	
 	@Override
-	public Calendar getDate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Set<Contact> getContacts() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getNotes() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getNotes() 
+	{
+		return this.notes;
 	}
 
 }
