@@ -64,11 +64,23 @@ public class ContactManagerImpl implements ContactManager {
 	 * 2# - ADD /////////////////////////////////////////////////////////////////
 	 */
 
+	/**
+	* Create a new record for a meeting that took place in the past.
+	*
+	* @throws IllegalArgumentException if the list of contacts is
+	* empty, or any of the contacts does not exist
+	* @throws NullPointerException if any of the arguments is null
+	*/
 	@Override
-	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) 
+	public void addNewPastMeeting(Set<Contact> contactSet, Calendar meetingDate, String text) 
 	{
-		MeetingImpl meeting = new MeetingImpl(contacts, date, getMeetingNewId());
-		meetingList.add(meeting);
+		if(meetingDate.compareTo(this.date) > 0) // e.g., 2013 - 2012 = 1
+		{
+			throw new IllegalArgumentException("Date is in the Future!");
+		}else{
+			checkIfIsAValidMeeting(contactSet, meetingDate);
+			makeAddMeeting("PAST", contactSet, meetingDate, text);
+		}
 	}
 
 	@Override
@@ -80,8 +92,9 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public void addNewContact(String name, String notes) 
 	{
-		if(name == null | notes == null) {
-			throw new NullPointerException("Date is in the pasty!"); 
+		if(name == null | notes == null) 
+		{
+			throw new NullPointerException("One of the parameters is null!"); 
 		}else{
 			ContactImpl contact = new ContactImpl(name, notes, getContactNewId());
 			contacts.add(contact);
@@ -90,28 +103,16 @@ public class ContactManagerImpl implements ContactManager {
 	
 	@Override
 	public int addFutureMeeting(Set<Contact> contactSet, Calendar meetingDate) 
-	/* 
-	 *  take the date of the meeting and compare with current date
-	 */
 	{
-		updateMgrDate();
 		if(meetingDate.compareTo(this.date) < 0) // e.g., 2012 - 2013 = -1
 		{
-			throw new IllegalArgumentException("Date is in the past!"); 
-			
-		}else if(!this.contacts.containsAll(contactSet)) 
-			//
-			// Do all contacts on the new meeting's set already exist in Mgr's contact list?
-		{
-			throw new IllegalArgumentException("Cannot Add contact list with unknown Contacts!" +
-					"\n" + "Please add them first");
-		}else
-		{	
-			Meeting newMeeting = new MeetingImpl(contactSet, meetingDate, getMeetingNewId());
-			meetingList.add(newMeeting);
+			throw new IllegalArgumentException("Date is in the past!");
+		}else{
+			checkIfIsAValidMeeting(contactSet, meetingDate);
+			makeAddMeeting("FUTURE", contactSet, meetingDate, "");
 			return this.meetingCounter;
 		}
-	} // close addFutureMeeting(...); //
+	} 
 	
 	/*
 	 * 3# - +METHODS /////////////////////////////////////////////////////////////////
@@ -124,6 +125,51 @@ public class ContactManagerImpl implements ContactManager {
 	 * became out dated during use.
 	 */
 	private void updateMgrDate() { this.date = new GregorianCalendar(); }
+	
+	/*
+	 * Checks that parameters are not null and that contact set is not empty
+	 * TRUE = all is swell
+	 */
+	private boolean checkIfIsAValidMeeting(Set<Contact> contactSet, Calendar meetingDate)
+	{
+		updateMgrDate();
+		if(contactSet == null | meetingDate == null)
+		{
+			throw new IllegalArgumentException("One of the parameters is null! This is not allowed");
+			
+		}else if(!this.contacts.containsAll(contactSet)) 
+			//
+			// Do all contacts on the new meeting's set already exist in Mgr's contact list?
+		{
+			throw new IllegalArgumentException("Cannot Add contact list with unknown Contacts!" +
+					"\n" + "Please add them first");
+		}else
+		{	
+			return true;
+		}
+	} // close checkIfIsAValidMeeting(...); //
+	
+	/*
+	 * 
+	 */
+	private Meeting makeAddMeeting(String meetingType, Set<Contact> contactSet, Calendar meetingDate, String note)
+	{
+		meetingType = meetingType.toUpperCase();
+		Meeting newMeeting;
+		
+		if(meetingType.equals("FUTURE") == true)
+		{
+			newMeeting = new MeetingImpl(contactSet, meetingDate, getMeetingNewId());
+			this.meetingList.add(newMeeting);
+			return (Meeting)newMeeting;
+			
+		}else if(meetingType.equals("PAST") == true){
+			
+			newMeeting = new PastMeetingImpl();
+			this.pastMeetingsList.add((PastMeeting)newMeeting);
+			return (Meeting)newMeeting;
+		}
+	}
 	
 
 	@Override
