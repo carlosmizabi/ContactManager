@@ -165,9 +165,12 @@ public class ContactManagerImpl implements ContactManager {
 			
 		}else if(meetingType.equals("PAST") == true){
 			
-			newMeeting = new PastMeetingImpl();
+			newMeeting = new PastMeetingImpl(contactSet, meetingDate, getMeetingNewId(), note);
 			this.pastMeetingsList.add((PastMeeting)newMeeting);
 			return (Meeting)newMeeting;
+		}else{
+			throw new IllegalArgumentException("The meeting type is incorrect! Only \"FUTURE\" " +
+					"or \"PAST\" is allowed!" + "\n" + "Check your code.");
 		}
 	}
 	
