@@ -34,7 +34,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * 1# - CLASS FIELDS & CONTRUCTOR/S		///////////////////////////////////////////
 	 */
 	
-	private Editor editor;						// the editor will fetch and store all information
+	private EditorImpl editor;						// the editor will fetch and store all information
 	Comparator<Contact> comparator;				// needed for contacts TreeSet iteration
 	private List<Meeting> meetingList;			// store all meetings
 	private List<PastMeeting> pastMeetingsList;	// store past meetings
@@ -52,13 +52,12 @@ public class ContactManagerImpl implements ContactManager {
 	{
 		date = new GregorianCalendar();		// date at initialization			
 		comparator = new ContactComparator();
-		contacts = new TreeSet<Contact>(comparator);
-		List<Meeting> meetingList = new LinkedList<Meeting>();
-		List<PastMeeting> pastMeetingsList = new LinkedList<PastMeeting>();
-		editor = new EditorImpl(contacts, meetingList, pastMeetingsList);
+		this.contacts = new TreeSet<Contact>(comparator);
+		this.meetingList = new LinkedList<Meeting>();
+		this.pastMeetingsList = new LinkedList<PastMeeting>();
+		editor = new EditorImpl(this.contacts, this.meetingList, this.pastMeetingsList);
 		setCounters();	// set the counter
 	}
-	
 	
 	/*
 	 * 2# - ADD /////////////////////////////////////////////////////////////////
@@ -196,7 +195,7 @@ public class ContactManagerImpl implements ContactManager {
 		{
 			throw new IllegalArgumentException("One of the parameters is null! This is not allowed");
 			
-		}else if(!this.contacts.containsAll(contactSet)) 
+		}else if(this.contacts.containsAll(contactSet) == false) 
 			//
 			// Do all contacts on the new meeting's set already exist in Mgr's contact list?
 		{
@@ -235,7 +234,7 @@ public class ContactManagerImpl implements ContactManager {
 	
 
 	@Override
-	public void flush() { editor.save(contacts, meetingList); }
+	public void flush() { editor.save(contacts, getOneBigList()); }
 	
 	/*
 	 * This method joins the meeting Lists (Past and Future) 
@@ -427,5 +426,7 @@ public class ContactManagerImpl implements ContactManager {
 		}
 		return returnList;
 	}
+	
+	
 	
 } // close class ContactManagerImpl{} //
