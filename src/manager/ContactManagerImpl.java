@@ -390,18 +390,23 @@ public class ContactManagerImpl implements ContactManager {
 		return null;
 	}
 
-	/**
-	* Returns a list with the contacts whose name contains that string.
-	*
-	* @param name the string to search for
-	* @return a list with the contacts whose name contains that string.
-	* @throws NullPointerException if the parameter is null
-	*/
+
 	@Override
 	public Set<Contact> getContacts(String name) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		Set<Contact> returnList = new TreeSet<Contact>(comparator);
+		
+		if(name == null){
+			throw new NullPointerException("The parameter name cannot be null!");
+		}else{
+			for(Contact contact : this.contacts)
+			{
+				if(contact.getName().contains(name)){
+					returnList.add(contact);
+				}
+			}	
+		}
+		return returnList;
 	}
 	
 } // close class ContactManagerImpl{} //
