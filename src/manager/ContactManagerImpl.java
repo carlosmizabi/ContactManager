@@ -315,6 +315,11 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) 
+	/*
+	 * Join the Lists and iterate over each contact. Then extract
+	 * the Contact<Set> and see if the contact is there. If it
+	 * is then add it to the return list.
+	 */ 
 	{
 		// TODO Auto-generated method stub
 		return null;
