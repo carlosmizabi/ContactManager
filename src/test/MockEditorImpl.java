@@ -47,7 +47,7 @@ public class MockEditorImpl implements Editor {
 	{
 		this.contactList = contacts;
 		contacts.add(new ContactImpl("Sidharta", 1));
-		contacts.add(new ContactImpl("Vishnu", 2));
+		//contacts.add(new ContactImpl("Vishnu", 2));
 		// System.out.println(contacts.size());
 	}
 	
@@ -66,7 +66,7 @@ public class MockEditorImpl implements Editor {
 	// ads meetings to the list
 	//
 	{
-		pastMeetings.add(new PastMeetingImpl());
+		//pastMeetings.add(new PastMeetinng());
 	}
 	
 	private void addMeeting(List<Meeting> meetings, Calendar date)
