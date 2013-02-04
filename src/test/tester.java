@@ -3,6 +3,7 @@ package test;
 import static org.junit.Assert.*;
 import manager.ContactComparator;
 import manager.ContactImpl;
+import manager.ContactManagerImpl;
 import manager.EditorImpl;
 import manager.MeetingImpl;
 import manager.XmlFormat;
@@ -11,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 /////////////////////////////////
 import interfaces.Contact;			// interface
+import interfaces.ContactManager;
 import interfaces.Editor;			// interface
 import test.MockEditorImpl;			// ^ implementation
 import interfaces.Meeting;			// interface
@@ -45,6 +47,21 @@ public class tester {
 		
 		// TODO Auto-generated method stub
 		
+		ContactManagerImpl cmgr = new ContactManagerImpl();
+		
+		System.out.println("Is it empty? "+ cmgr.getMeetingList().isEmpty());
+		cmgr.addNewContact("James Kirk", "The first!");
+		cmgr.addNewContact("Jean-Luc Picard", "The second!");
+		cmgr.addNewContact("Jonathan Archer", "The last!");
+		
+		for(Contact contact : cmgr.getContacts("Vishnu"))
+		{
+			System.out.println(contact.getName());
+		}
+		
+		
+		
+		
 		
 //		System.out.println("Tester contactList's size sent to editor:" +  contactList.size());
 //		//System.out.println(meetingList.get(1).toString());
@@ -53,10 +70,7 @@ public class tester {
 		
 		// LETS TEST THE File READER
 		
-		EditorImpl editor = new EditorImpl(contactList, meetingList, pastMeetingsList);
-		System.out.println("ContactList " + contactList.size());
-		System.out.println("MeettingList " + meetingList.size());
-		System.out.println("pastMeetingList  " + pastMeetingsList.size());
+		
 		
 //		editor.printClipBoard();
 //		BufferedReader in;
