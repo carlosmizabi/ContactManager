@@ -382,7 +382,7 @@ public class ContactManagerImpl implements ContactManager {
 		return returnList;
 	}
 
-	/**
+	/*
 	* Returns a list containing the contacts that correspond to the IDs.
 	*
 	* @param ids an arbitrary number of contact IDs
@@ -400,7 +400,7 @@ public class ContactManagerImpl implements ContactManager {
 			{
 				for(Contact contact : this.contacts)
 				{
-					if(contact.getId() == id) { returnList.add(contact); existingId = true; }
+					if(contact.getId() == id) { returnList.add(contact); }
 				}
 			}else{
 				existingId = false;
@@ -409,8 +409,7 @@ public class ContactManagerImpl implements ContactManager {
 		}
 		return returnList;
 	}
-
-
+	
 	@Override
 	public Set<Contact> getContacts(String name) 
 	{
