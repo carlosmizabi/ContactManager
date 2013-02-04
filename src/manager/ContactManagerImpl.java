@@ -38,7 +38,7 @@ public class ContactManagerImpl implements ContactManager {
 	Comparator<Contact> comparator;				// needed for contacts TreeSet iteration
 	private List<Meeting> meetingList;			// store all meetings
 	private List<PastMeeting> pastMeetingsList;	// store past meetings
-	private Calendar date;	// current date should be updated ALWAYS before use -> updateMgrDate();
+	private Calendar date;	// current date should ALWAYS be updated before use -> updateMgrDate();
 	private Set<Contact> contacts;				// contact list
 	
 	/* Meetings' and contacts' classes don't manage
@@ -105,20 +105,6 @@ public class ContactManagerImpl implements ContactManager {
 		}
 	} 
 
-	/**
-	* Adds notes to a meeting.
-	*
-	* This method is used when a future meeting takes place, and is
-	* then converted to a past meeting (with notes).
-	*
-	* It can be also used to add notes to a past meeting at a later date.
-	*
-	* @param id the ID of the meeting
-	* @param text messages to be added about the meeting.
-	* @throws IllegalArgumentException if the meeting does not exist
-	* @throws IllegalStateException if the meeting is set for a date in the future
-	* @throws NullPointerException if the notes are null
-	*/
 	@Override
 	public void addMeetingNotes(int id, String text) 
 	{
@@ -252,6 +238,8 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public void flush() { editor.save(contacts, meetingList); }
+	
+	
 
 	/*
 	 * 4# - SETTERS /////////////////////////////////////////////////////////////////
@@ -297,9 +285,15 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public Meeting getMeeting(int id) 
 	{
-		// TODO Auto-generated method stub
+		// temp meeting list of all meetings (past and future)
+		List<Meeting> tempMeetingList = new LinkedList<Meeting>();
+		tempMeetingList.addAll(meetingList);
+		tempMeetingList.addAll(pastMeetingsList);
+		
+		for(Meeting meeting : tempMeetingList) { if(meeting.getId() == id) { return meeting; } }
+		
 		return null;
-	}
+	} // close getMeeting(...) //
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) 
