@@ -289,20 +289,42 @@ public class ContactManagerImpl implements ContactManager {
 	public PastMeeting getPastMeeting(int id) 
 	{
 		Meeting meeting = getMeeting(id);
-		
 		if(meeting != null) 
 		{  
-			meeting.getDate().compareTo(updateMgrDate());
-		}
-		return null;
-	}
+			if(meeting.getDate().compareTo(updateMgrDate()) < 0){ return (PastMeeting)meeting; }
+		} 
+		return null; 
+	} // closes getPastMeeting(...); //
 
 	@Override
 	public FutureMeeting getFutureMeeting(int id) 
 	{
+		FutureMeeting meeting = new FutureMeetingImpl();
+		return (FutureMeeting)fetchMeetingByType(id, (Meeting)meeting);
+		
+	} // closes getFutureMeeting(...); //
+
+	/*
+	 * fetchMeetingByType() needs the id of the searched for
+	 *  meeting and an object either FutureMeeting or PastMeeting 
+	 *  in order to figure out which kind of meeting to check for.
+	 */
+	private Meeting fetchMeetingByType(int id, Meeting type)
+	{
+		Meeting meeting = getMeeting(id);
+		if(meeting != null) 
+		{  
+			if(type instanceof FutureMeeting)
+			{
+				if(meeting.getDate().compareTo(updateMgrDate()) >= 0){ return (FutureMeeting)meeting; }
+			}
+			else if (type instanceof PastMeeting)
+			{
+				if(meeting.getDate().compareTo(updateMgrDate()) < 0){ return (PastMeeting)meeting; }
+			}
+		} 
 		return null;
 	}
-
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) 
