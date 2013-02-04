@@ -123,8 +123,40 @@ public class ContactManagerImpl implements ContactManager {
 	public void addMeetingNotes(int id, String text) 
 	{
 		updateMeetingLists();
-		// TODO Auto-generated method stub
-	}
+		Boolean idExists = false;
+		Boolean futureMeeting = false;
+		Meeting tempMeeting = null;
+		
+		// Join all(future and past) Meetings in a temporary meeting List
+		//
+		List<Meeting> tempMeetingList = new LinkedList<Meeting>();
+		tempMeetingList.addAll(meetingList);
+		tempMeetingList.addAll(pastMeetingsList);
+		
+		for(Meeting meeting : tempMeetingList)
+		{
+			if(meeting.getId() == id) { idExists = true; }
+			
+			if(meeting.getDate().compareTo(this.date) > 0) { futureMeeting = true; }
+			
+			tempMeeting = meeting;
+		}
+
+		if(idExists == false)
+		{
+			throw new IllegalArgumentException("There are no meetings with the id: " + id);
+		}else if(futureMeeting == true)
+		{
+			throw new IllegalStateException ("Sorry, but you can only add notes to PAST meetings!");
+		}else if(text == null){
+			throw new NullPointerException ("The note Cannot be NULL!");
+		}
+		
+		// if meeting is not null cast it to PastMeeting and add the note
+		//
+		if(tempMeeting != null){ ((PastMeetingImpl)tempMeeting).addNotes(text); }
+		
+	} // close addMeetingNotes(...); // 
 
 	@Override
 	public void addNewContact(String name, String notes) 
@@ -143,13 +175,23 @@ public class ContactManagerImpl implements ContactManager {
 	 */
 	
 	/*
-	 * This method will look for meetings in the meeting lists check their dates and transfer
-	 * any meeting that is not longer a future meeting to the past meetings list.
+	 * This method will look for meetings in the meeting lists 
+	 * compare their dates to present. Any meeting that is not 
+	 * longer a future meeting to the past meetings list.
 	 */
 	private void updateMeetingLists()
 	{
-		
-	}
+		updateMgrDate();
+		for(Meeting meeting : meetingList)
+		{
+			if(meeting.getDate().compareTo(this.date) < 0)
+			{
+				// remove it from meetingList and on pastMeetingList
+				pastMeetingsList.add((PastMeeting)meeting);
+				meetingList.remove(meeting);
+			}		
+		}
+	}	// close updateMeetingList(); //
 	
 	/*
 	 * Update the date to current time when using date.
