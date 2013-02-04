@@ -115,9 +115,7 @@ public class ContactManagerImpl implements ContactManager {
 		
 		// Join all(future and past) Meetings in a temporary meeting List
 		//
-		List<Meeting> tempMeetingList = new LinkedList<Meeting>();
-		tempMeetingList.addAll(meetingList);
-		tempMeetingList.addAll(pastMeetingsList);
+		List<Meeting> tempMeetingList = getOneBigList();
 		
 		for(Meeting meeting : tempMeetingList)
 		{
@@ -239,7 +237,17 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public void flush() { editor.save(contacts, meetingList); }
 	
-	
+	/*
+	 * This method joins the meeting Lists (Past and Future) 
+	 * into one big list.
+	 */
+	private List<Meeting> getOneBigList()
+	{
+		List<Meeting> meetingList = new LinkedList<Meeting>();
+		meetingList.addAll(this.meetingList);
+		meetingList.addAll(this.pastMeetingsList);
+		return meetingList;
+	}
 
 	/*
 	 * 4# - SETTERS /////////////////////////////////////////////////////////////////
@@ -274,9 +282,7 @@ public class ContactManagerImpl implements ContactManager {
 	{
 		// temp meeting list of all meetings (past and future)
 		//
-		List<Meeting> tempMeetingList = new LinkedList<Meeting>();
-		tempMeetingList.addAll(meetingList);
-		tempMeetingList.addAll(pastMeetingsList);
+		List<Meeting> tempMeetingList = getOneBigList();
 		
 		// Iterate over temporary list and if found return it
 		//
@@ -321,22 +327,48 @@ public class ContactManagerImpl implements ContactManager {
 	 * is then add it to the return list.
 	 */ 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		List<Meeting> returnList = new LinkedList<Meeting>();
+		List<Meeting> allMeetings = getOneBigList();
+		Set<Contact> meetingContactSet = null;
+		
+		for(Meeting meeting : allMeetings)
+		{
+			meetingContactSet = meeting.getContacts();
+			if(meetingContactSet.contains(contact)) { returnList.add(meeting); }
+		}
+		return returnList;
 	}
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Calendar date) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		List<Meeting> returnList = new LinkedList<Meeting>();
+		List<Meeting> allMeetings = getOneBigList();
+		
+		for(Meeting meeting : allMeetings)
+		{
+			if(meeting.getDate().compareTo(updateMgrDate()) > 0)
+			{
+				returnList.add(meeting);
+			}
+		}
+		return returnList;
 	}
 
 	@Override
 	public List<PastMeeting> getPastMeetingList(Contact contact) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		List<PastMeeting> returnList = new LinkedList<PastMeeting>();
+		List<Meeting> allMeetings = getOneBigList();
+		
+		for(Meeting meeting : allMeetings)
+		{
+			if(meeting.getDate().compareTo(updateMgrDate()) < 0)
+			{
+				returnList.add((PastMeeting)meeting);
+			}
+		}
+		return returnList;
 	}
 
 	@Override
