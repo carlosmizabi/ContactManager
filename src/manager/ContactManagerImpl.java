@@ -288,40 +288,30 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public PastMeeting getPastMeeting(int id) 
 	{
-		return (PastMeeting)fetchMeetingByType(id, "PastMeeting");
+		Meeting meeting = getMeeting(id);
+		if(meeting.getDate().compareTo(updateMgrDate()) > 0)
+		{ 
+			throw new IllegalArgumentException("The id passed is for a future " +
+					"meeting and not for a past meeting!");
+		}
+		return (PastMeeting)meeting;
 	} // closes getPastMeeting(...); //
 
 	@Override
 	public FutureMeeting getFutureMeeting(int id) 
 	{
-		return (FutureMeeting)fetchMeetingByType(id, "FutureMeeting");
-		
-	} // closes getFutureMeeting(...); //
-
-	/*
-	 * fetchMeetingByType() needs the id of the searched for
-	 *  meeting and an object either FutureMeeting or PastMeeting 
-	 *  in order to figure out which kind of meeting to check for.
-	 */
-	private Meeting fetchMeetingByType(int id, String meetingType)
-	{
 		Meeting meeting = getMeeting(id);
 		if(meeting != null) 
 		{  
-			if(meetingType.equals("FutureMeeting"))
-			{
-				if(meeting.getDate().compareTo(updateMgrDate()) >= 0){ return meeting; }
+			if(meeting.getDate().compareTo(updateMgrDate()) < 0)
+			{ 
+				throw new IllegalArgumentException("The id passed is for a past " +
+						"meeting and not for a future meeting!");
 			}
-			else if (meetingType.equals("PastMeeting"))
-			{
-				if(meeting.getDate().compareTo(updateMgrDate()) < 0){ return meeting; }
-			}else{
-				throw new IllegalArgumentException("Illegal Parameter: " +
-					"The Meeting Type must be either \"FutureMeeting\" or \"PastMeeting\"");
-			}
-		} 
-		return null;
-	}
+		}
+		return (FutureMeeting)meeting;
+		
+	} // closes getFutureMeeting(...); //
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) 
