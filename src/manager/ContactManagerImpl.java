@@ -328,13 +328,19 @@ public class ContactManagerImpl implements ContactManager {
 	 */ 
 	{
 		List<Meeting> returnList = new LinkedList<Meeting>();
-		List<Meeting> allMeetings = getOneBigList();
-		Set<Contact> meetingContactSet = null;
-		
-		for(Meeting meeting : allMeetings)
+		if(!this.contacts.contains(contact))
 		{
-			meetingContactSet = meeting.getContacts();
-			if(meetingContactSet.contains(contact)) { returnList.add(meeting); }
+			throw new IllegalArgumentException("Contact does not exist!");
+		}else{
+			List<Meeting> allMeetings = getOneBigList();
+			
+			for(Meeting meeting : allMeetings)
+			{
+				if(meeting.getDate().compareTo(updateMgrDate()) > 0)
+				{
+					returnList.add(meeting);
+				}
+			}
 		}
 		return returnList;
 	}
@@ -359,18 +365,24 @@ public class ContactManagerImpl implements ContactManager {
 	public List<PastMeeting> getPastMeetingList(Contact contact) 
 	{
 		List<PastMeeting> returnList = new LinkedList<PastMeeting>();
-		List<Meeting> allMeetings = getOneBigList();
-		
-		for(Meeting meeting : allMeetings)
+		if(!this.contacts.contains(contact))
 		{
-			if(meeting.getDate().compareTo(updateMgrDate()) < 0)
+			throw new IllegalArgumentException("Contact does not exist!");
+		}else{
+			List<Meeting> allMeetings = getOneBigList();
+			
+			for(Meeting meeting : allMeetings)
 			{
-				returnList.add((PastMeeting)meeting);
+				if(meeting.getDate().compareTo(updateMgrDate()) < 0)
+				{
+					returnList.add((PastMeeting)meeting);
+				}
 			}
 		}
 		return returnList;
 	}
 
+	
 	@Override
 	public Set<Contact> getContacts(int... ids) 
 	{
@@ -378,6 +390,13 @@ public class ContactManagerImpl implements ContactManager {
 		return null;
 	}
 
+	/**
+	* Returns a list with the contacts whose name contains that string.
+	*
+	* @param name the string to search for
+	* @return a list with the contacts whose name contains that string.
+	* @throws NullPointerException if the parameter is null
+	*/
 	@Override
 	public Set<Contact> getContacts(String name) 
 	{
