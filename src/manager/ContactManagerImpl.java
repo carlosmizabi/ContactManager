@@ -382,12 +382,32 @@ public class ContactManagerImpl implements ContactManager {
 		return returnList;
 	}
 
-	
+	/**
+	* Returns a list containing the contacts that correspond to the IDs.
+	*
+	* @param ids an arbitrary number of contact IDs
+	* @return a list containing the contacts that correspond to the IDs.
+	* @throws IllegalArgumentException if any of the IDs does not correspond to a real contact
+	*/
 	@Override
 	public Set<Contact> getContacts(int... ids) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		Set<Contact> returnList = new TreeSet<Contact>(comparator);
+		Boolean existingId = true;
+		for(int id : ids)
+		{
+			if(existingId == true)
+			{
+				for(Contact contact : this.contacts)
+				{
+					if(contact.getId() == id) { returnList.add(contact); existingId = true; }
+				}
+			}else{
+				existingId = false;
+				throw new IllegalArgumentException("The id: " + id + " does not exist!");
+			}
+		}
+		return returnList;
 	}
 
 
