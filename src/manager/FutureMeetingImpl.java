@@ -6,24 +6,9 @@ import java.util.Set;
 import interfaces.Contact;
 import interfaces.FutureMeeting;
 
-public class FutureMeetingImpl implements FutureMeeting {
+public class FutureMeetingImpl extends MeetingImpl implements FutureMeeting {
 
-	@Override
-	public int getId() {
-		// TODO Auto-generated method stub
-		return 0;
+	public FutureMeetingImpl(Set<Contact> contacts, Calendar meetDate, int id){
+		super(contacts, meetDate,id);
 	}
-
-	@Override
-	public Calendar getDate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Set<Contact> getContacts() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
