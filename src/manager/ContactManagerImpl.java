@@ -185,7 +185,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * The initialized date at construction might have
 	 * became out dated during use.
 	 */
-	private void updateMgrDate() { this.date = new GregorianCalendar(); }
+	private Calendar updateMgrDate() { return this.date = new GregorianCalendar(); }
 	
 	/*
 	 * Checks that parameters are not null and that contact set is not empty
@@ -270,9 +270,30 @@ public class ContactManagerImpl implements ContactManager {
 	}
 	
 	@Override
+	public Meeting getMeeting(int id) 
+	{
+		// temp meeting list of all meetings (past and future)
+		//
+		List<Meeting> tempMeetingList = new LinkedList<Meeting>();
+		tempMeetingList.addAll(meetingList);
+		tempMeetingList.addAll(pastMeetingsList);
+		
+		// Iterate over temporary list and if found return it
+		//
+		for(Meeting meeting : tempMeetingList) { if(meeting.getId() == id) { return meeting; } }
+		
+		return null;
+	} // close getMeeting(...) //
+	
+	@Override
 	public PastMeeting getPastMeeting(int id) 
 	{
-		// TODO Auto-generated method stub
+		Meeting meeting = getMeeting(id);
+		
+		if(meeting != null) 
+		{  
+			meeting.getDate().compareTo(updateMgrDate());
+		}
 		return null;
 	}
 
@@ -282,18 +303,6 @@ public class ContactManagerImpl implements ContactManager {
 		return null;
 	}
 
-	@Override
-	public Meeting getMeeting(int id) 
-	{
-		// temp meeting list of all meetings (past and future)
-		List<Meeting> tempMeetingList = new LinkedList<Meeting>();
-		tempMeetingList.addAll(meetingList);
-		tempMeetingList.addAll(pastMeetingsList);
-		
-		for(Meeting meeting : tempMeetingList) { if(meeting.getId() == id) { return meeting; } }
-		
-		return null;
-	} // close getMeeting(...) //
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) 
