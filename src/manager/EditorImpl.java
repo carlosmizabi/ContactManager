@@ -31,7 +31,9 @@ public class EditorImpl implements Editor {
 	private Scanner scanner;
 	private PrintWriter out = null;
 	private BufferedReader in = null;
-	private ArrayList<HashMap<String, String>> clipboard;			// holder of new objects elements (contact or meetings).
+	private ArrayList<HashMap<String, String>> clipboard;			
+	//
+	// holder of new objects elements (contact or meetings).
 	
 	/* REVERSED HASHMAP : the content are the keys of the Map and the 
 	 * xml tags are the value. Though it might sound counter-intuitive
@@ -182,7 +184,7 @@ public class EditorImpl implements Editor {
 			/* This element will be used by the readerLineProcessor. It needs to 
 			 * be instantiated here because we only need from here on.
 			 */
-			clipboard = new ArrayList<HashMap>();	// store attribute objects(each a list of values)
+			clipboard = new ArrayList<HashMap<String, String>>();	
 			
 			while ((line = in.readLine()) != null) 
 			{
