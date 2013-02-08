@@ -39,7 +39,7 @@ public class ContactManagerImpl implements ContactManager {
 	private List<Meeting> meetingList;			// store all meetings
 	private List<PastMeeting> pastMeetingsList;	// store past meetings
 	private Calendar date;	// current date should ALWAYS be updated before use -> updateMgrDate();
-	private Set<Contact> contacts;				// contact list
+	private Set<Contact> contactsList;				// contact list
 	
 	/* Meetings' and contacts' classes don't manage
 	 * the id assignment and management, hence it needs
@@ -52,10 +52,10 @@ public class ContactManagerImpl implements ContactManager {
 	{
 		date = new GregorianCalendar();		// date at initialization			
 		comparator = new ContactComparator();
-		this.contacts = new TreeSet<Contact>(comparator);
+		this.contactsList = new TreeSet<Contact>(comparator);
 		this.meetingList = new LinkedList<Meeting>();
 		this.pastMeetingsList = new LinkedList<PastMeeting>();
-		editor = new EditorImpl(this.contacts, this.meetingList, this.pastMeetingsList);
+		editor = new EditorImpl(this.contactsList, this.meetingList, this.pastMeetingsList);
 		setCounters();	// set the counter
 	}
 	
@@ -149,7 +149,7 @@ public class ContactManagerImpl implements ContactManager {
 			throw new NullPointerException("One of the parameters is null!"); 
 		}else{
 			ContactImpl contact = new ContactImpl(name, notes, getContactNewId());
-			contacts.add(contact);
+			contactsList.add(contact);
 		}
 	}
 	
@@ -195,7 +195,7 @@ public class ContactManagerImpl implements ContactManager {
 		{
 			throw new IllegalArgumentException("One of the parameters is null! This is not allowed");
 			
-		}else if(this.contacts.containsAll(contactSet) == false) 
+		}else if(this.contactsList.containsAll(contactSet) == false) 
 			//
 			// Do all contacts on the new meeting's set already exist in Mgr's contact list?
 		{
@@ -234,7 +234,7 @@ public class ContactManagerImpl implements ContactManager {
 	
 
 	@Override
-	public void flush() { editor.save(contacts, getOneBigList()); }
+	public void flush() { editor.save(contactsList, getOneBigList()); }
 	
 	/*
 	 * This method joins the meeting Lists (Past and Future) 
@@ -258,7 +258,7 @@ public class ContactManagerImpl implements ContactManager {
 	private void setCounters()
 	{
 		meetingCounter = meetingList.size();
-		contactCounter = contacts.size();
+		contactCounter = contactsList.size();
 	}
 	
 	/*
@@ -327,7 +327,7 @@ public class ContactManagerImpl implements ContactManager {
 	 */ 
 	{
 		List<Meeting> returnList = new LinkedList<Meeting>();
-		if(!this.contacts.contains(contact))
+		if(!this.contactsList.contains(contact))
 		{
 			throw new IllegalArgumentException("Contact does not exist!");
 		}else{
@@ -364,17 +364,15 @@ public class ContactManagerImpl implements ContactManager {
 	public List<PastMeeting> getPastMeetingList(Contact contact) 
 	{
 		List<PastMeeting> returnList = new LinkedList<PastMeeting>();
-		if(!this.contacts.contains(contact))
+		if(!this.contactsList.contains(contact))
 		{
 			throw new IllegalArgumentException("Contact does not exist!");
 		}else{
-			List<Meeting> allMeetings = getOneBigList();
-			
-			for(Meeting meeting : allMeetings)
+			for(PastMeeting meeting : pastMeetingsList)
 			{
 				if(meeting.getDate().compareTo(updateMgrDate()) < 0)
 				{
-					returnList.add((PastMeeting)meeting);
+					returnList.add(meeting);
 				}
 			}
 		}
@@ -397,7 +395,7 @@ public class ContactManagerImpl implements ContactManager {
 		{
 			if(existingId == true)
 			{
-				for(Contact contact : this.contacts)
+				for(Contact contact : this.contactsList)
 				{
 					if(contact.getId() == id) { returnList.add(contact); }
 				}
@@ -417,7 +415,7 @@ public class ContactManagerImpl implements ContactManager {
 		if(name == null){
 			throw new NullPointerException("The parameter name cannot be null!");
 		}else{
-			for(Contact contact : this.contacts)
+			for(Contact contact : this.contactsList)
 			{
 				if(contact.getName().contains(name)){
 					returnList.add(contact);
