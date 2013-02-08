@@ -40,6 +40,7 @@ public class ContactManagerImpl implements ContactManager {
 	private List<PastMeeting> pastMeetingsList;	// store past meetings
 	private Calendar date;	// current date should ALWAYS be updated before use -> updateMgrDate();
 	private Set<Contact> contactsList;				// contact list
+	private static dateComparator dateCmparator;
 	
 	/* Meetings' and contacts' classes don't manage
 	 * the id assignment and management, hence it needs
@@ -50,6 +51,7 @@ public class ContactManagerImpl implements ContactManager {
 	
 	public ContactManagerImpl()
 	{
+		dateCmparator = new dateComparator(); // for data comparisons
 		date = new GregorianCalendar();		// date at initialization			
 		comparator = new ContactComparator();
 		this.contactsList = new TreeSet<Contact>(comparator);
@@ -164,7 +166,7 @@ public class ContactManagerImpl implements ContactManager {
 	 */
 	private void updateMeetingLists()
 	{
-		updateMgrDate();
+		updatedMgrDate();
 		for(Meeting meeting : meetingList)
 		{
 			if(meeting.getDate().compareTo(this.date) < 0)
@@ -182,7 +184,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * The initialized date at construction might have
 	 * became out dated during use.
 	 */
-	private Calendar updateMgrDate() { return this.date = new GregorianCalendar(); }
+	private Calendar updatedMgrDate() { return this.date = new GregorianCalendar(); }
 	
 	/*
 	 * Checks that parameters are not null and that contact set is not empty
@@ -190,7 +192,7 @@ public class ContactManagerImpl implements ContactManager {
 	 */
 	private boolean checkIfIsAValidMeeting(Set<Contact> contactSet, Calendar meetingDate)
 	{
-		updateMgrDate();
+		updatedMgrDate();
 		if(contactSet == null | meetingDate == null)
 		{
 			throw new IllegalArgumentException("One of the parameters is null! This is not allowed");
@@ -294,7 +296,7 @@ public class ContactManagerImpl implements ContactManager {
 	public PastMeeting getPastMeeting(int id) 
 	{
 		Meeting meeting = getMeeting(id);
-		if(meeting.getDate().compareTo(updateMgrDate()) > 0)
+		if(meeting.getDate().compareTo(updatedMgrDate()) > 0)
 		{ 
 			throw new IllegalArgumentException("The id passed is for a future " +
 					"meeting and not for a past meeting!");
@@ -308,7 +310,7 @@ public class ContactManagerImpl implements ContactManager {
 		Meeting meeting = getMeeting(id);
 		if(meeting != null) 
 		{  
-			if(meeting.getDate().compareTo(updateMgrDate()) < 0)
+			if(meeting.getDate().compareTo(updatedMgrDate()) < 0)
 			{ 
 				throw new IllegalArgumentException("The id passed is for a past " +
 						"meeting and not for a future meeting!");
@@ -326,23 +328,88 @@ public class ContactManagerImpl implements ContactManager {
 	 * is then add it to the return list.
 	 */ 
 	{
+		updateMeetingLists();
 		List<Meeting> returnList = new LinkedList<Meeting>();
 		if(!this.contactsList.contains(contact))
 		{
 			throw new IllegalArgumentException("Contact does not exist!");
 		}else{
-			List<Meeting> allMeetings = getOneBigList();
 			
-			for(Meeting meeting : allMeetings)
-			{
-				if(meeting.getDate().compareTo(updateMgrDate()) > 0)
+			// (1) Iterate over the meetingList
+			//
+			for(Meeting meeting : meetingList)
+			{				
+				// (2) Check the date is in future
+				//
+				if(meeting.getDate().compareTo(updatedMgrDate()) > 0)
 				{
-					returnList.add(meeting);
+					// (3) Peep and check that its contactSet has the contact
+					//
+					if(meeting.getContacts().contains(contact) == true)
+					{
+						// (4) If it does then add it to the return list
+						//
+						returnList.add(meeting);
+					}
 				}
 			}
 		}
-		return returnList;
+		
+		return orderListChronologically(returnList);
 	}
+
+	private List<Meeting> orderListChronologically(List<Meeting> returnList) 
+	{
+		// Because the LinkedList does not have a getNext one needs to keep
+		// track of the next Meeting index. In order to compare current with
+		// next and to use it to compare backwards.
+		// 
+		int nextMeeting = 1;
+		
+		// (1) Iterate over the returnList
+		//
+		for (Meeting meeting : returnList)
+		{
+			// (2) compare this meeting with nextMeeting if result is a 
+			// negative number (2012 - 2013 = -1) then it is ordered correctly.
+			// If NOT and it is greater than 0 then the next meeting takes place before
+			// the current meeting: must send it to its place somewhere before current
+			//
+			if(meeting.getDate().compareTo(returnList.get(nextMeeting).getDate()) > 0) 
+			{
+				// (3) So the next meeting should be somewhere before current meeting
+				// lets iterate over the return list backwards 
+				// jMeeting starts on the current meeting's list index -1 or 
+				// more precisely (nextMeeting-2)
+				//
+				for(int jMeeting = (nextMeeting-2); jMeeting >= 0; jMeeting--)
+				{
+					// Making sure that jMeeting is not an null index of returnList
+					//
+					if (returnList.get(jMeeting) != null){
+						
+						// (4) If (nextMeeting - jMeeting) is smaller than 0 (ex. -1) then
+						// jMeeting takes place after the
+						//
+						if( returnList.get(nextMeeting).getDate().compareTo(returnList.get(jMeeting).getDate())
+								< 0 )
+						{
+							// (5) remove it from list and add it at the position jMeeting+1
+							//
+							returnList.add(jMeeting+1, returnList.remove(nextMeeting));
+						}
+					}else{	// the nextMeeting has the "smallest" date so far
+						returnList.add(0, returnList.remove(nextMeeting));
+					}
+				} //for(int jMeeting ... //
+			} // closes if (...) date comparison //
+			
+			nextMeeting++; 
+			
+		}// closes for (Meeting meeting : returnList) //
+		
+		return returnList;
+	} // closes orderListChronologically(...) //
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Calendar date) 
@@ -352,7 +419,7 @@ public class ContactManagerImpl implements ContactManager {
 		
 		for(Meeting meeting : allMeetings)
 		{
-			if(meeting.getDate().compareTo(updateMgrDate()) > 0)
+			if(meeting.getDate().compareTo(updatedMgrDate()) > 0)
 			{
 				returnList.add(meeting);
 			}
@@ -370,7 +437,7 @@ public class ContactManagerImpl implements ContactManager {
 		}else{
 			for(PastMeeting meeting : pastMeetingsList)
 			{
-				if(meeting.getDate().compareTo(updateMgrDate()) < 0)
+				if(meeting.getDate().compareTo(updatedMgrDate()) < 0)
 				{
 					returnList.add(meeting);
 				}
@@ -425,6 +492,21 @@ public class ContactManagerImpl implements ContactManager {
 		return returnList;
 	}
 	
-	
+	 class dateComparator implements Comparator<Calendar>{
+
+		@Override
+		public int compare(Calendar arg0, Calendar arg1) {
+			if(arg0.getTimeInMillis() == arg1.getTimeInMillis())
+			{
+				return 0;
+			}else if(arg0.getTimeInMillis() > arg1.getTimeInMillis()){
+				return 1;
+			}else{
+				return -1;
+			}
+		}	
+	 } // close class dateComparator{} //
 	
 } // close class ContactManagerImpl{} //
+
+
