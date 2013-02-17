@@ -24,7 +24,7 @@ import org.junit.Test;
 public class TEST_ContactManagerImpl {
 	
 	ContactManager cmgr;
-	Comparator<Contact> comparator;
+	//Comparator<Contact> comparator;
 
 //	@BeforeClass
 //	public static void setUpBeforeClass() throws Exception {
@@ -50,8 +50,8 @@ public class TEST_ContactManagerImpl {
 	@Test
 	public void testAddFutureMeeting() {
 		Calendar date = new GregorianCalendar(2014, 01, 01);
-		comparator = new ContactComparator();
-		Set<Contact> contactSet = new TreeSet<Contact>(comparator);
+		//comparator = new ContactComparator();
+		Set<Contact> contactSet = new TreeSet<Contact>();
 		String james = "James T. Kirk";
 		String jean = "Jean-Luc Picard";
 		cmgr.addNewContact(james, "Spok");
@@ -62,7 +62,6 @@ public class TEST_ContactManagerImpl {
 		
 		for(Contact contact : cmgr.getContacts(jean))
 		{ if(contact.getName().equals(jean)) { contactSet.add(contact); } }
-		
 		
 		cmgr.addFutureMeeting(contactSet, date);
 	}
