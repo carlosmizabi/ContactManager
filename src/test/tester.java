@@ -46,6 +46,7 @@ public class tester {
 	public static void main(String[] args) {
 		
 		ContactManager mgr = new ContactManagerImpl();
+		Calendar date12 = new GregorianCalendar(2012, 1, 2);
 		Calendar date14 = new GregorianCalendar(2014, 1, 2);
 		Calendar date15 = new GregorianCalendar(2015, 1, 1);
 		Calendar date16 = new GregorianCalendar(2016, 1, 2);
@@ -83,6 +84,7 @@ public class tester {
 		}
 		
 		mgr.flush();
+		mgr.addNewPastMeeting(contactList, date12, "Very Weird Meeting, full of Teletubies!");
 		
 		ContactManager mgr2 = new ContactManagerImpl();
 		
