@@ -98,8 +98,7 @@ public class EditorImpl implements Editor {
 		// is there a xml user date source file? = need method to check
 		//System.out.print(setFile());
 		
-		readFile();
-		objectGenerator();
+		setFile();
 		addInitialLists(contacts, meetings, pastMeetings);
 
 	}
@@ -178,7 +177,7 @@ public class EditorImpl implements Editor {
 		try{
 //System.out.println("Reading file");  //+++++++++++++++++++++++++++++++++
 			
-			in = new BufferedReader(new FileReader("userdata99.xml"));
+			in = new BufferedReader(new FileReader("userdata.xml"));
 			String line;						// store the line of file being read
 						
 			/* This element will be used by the readerLineProcessor. It needs to 
