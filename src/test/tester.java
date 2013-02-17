@@ -45,21 +45,75 @@ public class tester {
 
 	public static void main(String[] args) {
 		
-		// TODO Auto-generated method stub
+		ContactManager mgr = new ContactManagerImpl();
+		Calendar date14 = new GregorianCalendar(2014, 1, 2);
+		Calendar date15 = new GregorianCalendar(2015, 1, 1);
+		Calendar date16 = new GregorianCalendar(2016, 1, 2);
+
+		String fstString = "First";
+		String sndString = "Second";
+		String sid = fstString;
+		mgr.addNewContact(fstString, "");
+		mgr.addNewContact(sndString, "");
 		
-		ContactManagerImpl cmgr = new ContactManagerImpl();
+		Contact firstContact = null;
+		Set<Contact> contactList = mgr.getContacts(sid);
 		
-		System.out.println("Is it empty? "+ cmgr.getMeetingList().isEmpty());
-		cmgr.addNewContact("James Kirk", "The first!");
-		cmgr.addNewContact("Jean-Luc Picard", "The second!");
-		cmgr.addNewContact("Jonathan Archer", "The last!");
-		
-		for(Contact contact : cmgr.getContacts("Vishnu"))
+		for(Contact contact : contactList)
 		{
-			System.out.println(contact.getName());
+			if(contact.getName().equals(sid)){
+				firstContact = contact;
+			}
+		}
+		System.out.println(firstContact.getName());
+		//Meeting meet01 = new MeetingImpl(contactList, date15, 1);
+		mgr.addFutureMeeting(contactList, date15); 
+		mgr.addFutureMeeting(contactList, date16); 
+		mgr.addFutureMeeting(contactList, date14); 
+		
+		if(firstContact != null){
+			List<Meeting> meetList = mgr.getFutureMeetingList(firstContact);
+			
+			System.out.println("meet List size " + meetList.size());
+			for(Meeting meeting : meetList)
+			{
+				System.out.println("Meetings ids:" + meeting.getId());
+			}
 		}
 		
 		
+//		ContactManagerImpl cmgr = new ContactManagerImpl();
+//		String james = "James T. Kirk";
+//		String jean = "Jean-Luc Picard";
+//		Comparator<Contact> comparator = new ContactComparator();
+//		Set<Contact> contactSet = new TreeSet<Contact>(comparator);
+//		Boolean exists = false;
+//		Calendar date = new GregorianCalendar(2012, 4, 4);
+//		cmgr.addNewPastMeeting(contactSet, date, "Helloooaa!");
+//		Contact contacto = null;
+//		
+//		// Need to iterate over the set to extract the contact
+//		// If contact is found then assign it to contacto
+//		// so that it can get a list of meeting from the cmgr
+//		//
+//		for(Contact contact : contactSet)
+//		{ 
+//			if(contact.getName().equals(jean)){ contacto = contact; } 
+//		}
+//		List<PastMeeting> meetings = cmgr.getPastMeetingList(contacto);
+//		for(PastMeeting meeting : meetings)
+//		{
+//			
+//			if(meeting.getDate().equals(date)){ exists = true; }
+//		}
+		
+//		List<Integer> list = new LinkedList<Integer>();
+//		
+//		for(int i =0; i < 10; i++)
+//		{
+//			list.add((Integer)i);
+//		}
+//		System.out.println("Checking the indexOf" + list.get(10));
 		
 		
 		
@@ -144,6 +198,27 @@ public class tester {
 //	}
 		
 	}
+	
+//	 class meetingDateComparator implements Comparable<Meeting>{
+//
+//			@Override
+//			public int compare(Meeting arg0, Meeting arg1) {
+//				if(arg0.getDate().getTimeInMillis() == arg1.getDate().getTimeInMillis())
+//				{
+//					return 0;
+//				}else if(arg0.getDate().getTimeInMillis() > arg1.getDate().getTimeInMillis()){
+//					return 1;
+//				}else{
+//					return -1;
+//				}
+//			}
+//
+//			@Override
+//			public int compareTo(Meeting arg0) {
+//				// TODO Auto-generated method stub
+//				return 0;
+//			}	
+//		 } // close class dateComparator{} //
 	
 }
 
