@@ -523,6 +523,28 @@ public class ContactManagerImpl implements ContactManager {
 		return returnList;
 	}
 	
+	/**
+	 * @return string of backup status "ON" or "OFF"
+	 */
+	public String getBackupStatus()
+	{
+		return editor.getBackupStatus();
+	}
+	
+	/**
+	 * @param onOff it must either "ON" or "OFF"
+	 * @return string of backup status 
+	 * @throws IllegalArgumentException if the @param is null.
+	 */
+	public void setBackupStatus(String onOff)
+	{
+		try {
+			editor.setBackup(onOff);
+		}catch(IllegalArgumentException e){
+			e.getMessage();
+		}
+	}
+	
 	 class meetingDateComparator implements Comparator<Meeting>
 	 {
 		@Override
