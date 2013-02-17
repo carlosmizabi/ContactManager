@@ -488,10 +488,22 @@ public class EditorImpl implements Editor {
 					out = new PrintWriter(new FileWriter(FILENAME, true));
 					
 					// 1 - Process Contacts
-					
-					
+					if(contactList.isEmpty() == false)
+					{
+						for(Contact contact : contactList)
+						{
+							writeContact(contact);
+						}
+					}
 					
 					// 2 - Process Meetings
+					if(meetingList.isEmpty() == false)
+					{
+						for(Meeting meeting : meetingList)
+						{
+							writeMeeting(meeting);
+						}
+					}
 					
 					} catch (FileNotFoundException ex) {
 					// This happens if file does not exist and cannot be created,
