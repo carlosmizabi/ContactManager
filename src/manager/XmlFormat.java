@@ -134,8 +134,8 @@ public class XmlFormat {
 	  
 	private static String[] toArray(String element)
 	{
-		String open = "<" + element + ">";
-		String close = "</" + open.substring(1);
+		String open = OPEN + element + CLOSE;
+		String close = OPEN+ "/" + open.substring(1);
 		String[] array = {open,close};
 		return array;
 	}

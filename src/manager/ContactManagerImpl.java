@@ -252,7 +252,10 @@ public class ContactManagerImpl implements ContactManager {
 	
 
 	@Override
-	public void flush() { editor.save(contactsList, getOneBigList()); }
+	public void flush() 
+	{ 
+		editor.save(contactsList, getOneBigList()); 
+	}
 	
 	/*
 	 * This method joins the meeting Lists (Past and Future) 
