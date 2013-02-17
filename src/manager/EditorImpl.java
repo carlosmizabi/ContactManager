@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;			// holds the clipboard items
@@ -26,7 +27,8 @@ import interfaces.PastMeeting;
 public class EditorImpl implements Editor {
 	
 	private static final 
-	String FILENAME = "userdata.xml";	// user data file name
+			String FILENAME = "userdata.xml";	// user data file name
+	private final static XmlFormat XML_FORMAT = new XmlFormat();
 	private Reader reader;  // inner class - READS FROM user data file
 	private Writer writer;	// inner class - WRITES TO user data file
 	private File file;
@@ -157,9 +159,9 @@ public class EditorImpl implements Editor {
 	{
 		file = new File(FILENAME);
 		try {
-			out = new PrintWriter(file);
-			XmlFormat xml = new XmlFormat();
-			out.write(xml.getSkeleton());
+			this.out = new PrintWriter(file);
+			
+			this.out.write(this.XML_FORMAT.getSkeleton());
 		} catch (FileNotFoundException ex) {
 			// This happens if file does not exist and cannot be created,
 			// or if it exists, but is not writable, return false
@@ -168,7 +170,7 @@ public class EditorImpl implements Editor {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
-			out.close();
+			this.out.close();
 		}
 		return true;
 	}
@@ -285,9 +287,12 @@ public class EditorImpl implements Editor {
 		int[] date = {year, month, day};
 		return date;
 	}
+	
 	@Override
 	public boolean save(Set<Contact> contacts, List<Meeting> meetings) {
 		// TODO Auto-generated method stub
+		
+		writer.write();
 		return false;
 	}
 	
@@ -324,11 +329,7 @@ public class EditorImpl implements Editor {
 	 *  
 	 *////////////////////////////////////////////////////////////////////
 	
-	private class Reader{
-		
-		private Reader(){
-			// empty constructor
-		}
+	 private class Reader{
 		
 		/*
 		 * IMPORTANT: The readeFile and related methods needs 
@@ -460,7 +461,7 @@ public class EditorImpl implements Editor {
 			}
 		}
 		
-	}
+	} // Closes class Reader{}
 	
 	
 	/*////////////////////////////////////////////////////////////////////
@@ -471,8 +472,36 @@ public class EditorImpl implements Editor {
 	
 	private class Writer{
 		
+		private boolean write()
+		{
+			// Just to make sure
+			//
+			if(fileExists() == false){
+				makeFile();
+			}
+			
+			// Lets ask again
+			//
+			if(fileExists() == true)
+			{
+				try {
+					out = new PrintWriter(new FileWriter(FILENAME, true));
+					String[] xmlContact = XML_FORMAT.getContact();
+					out.println(xmlContact[0]);
+					} catch (FileNotFoundException ex) {
+					// This happens if file does not exist and cannot be created,
+					// or if it exists, but is not writable
+					System.out.println("Cannot write to file " + file + ".");
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					} finally {
+						out.close();
+					}
+			}
+			return false;
 		
+		}
 		
-	}
+	} // Closes class Writer{}
 
-}
+} // Closes class EditorImpl{}
