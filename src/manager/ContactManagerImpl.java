@@ -7,7 +7,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+
 
 import interfaces.Contact;
 import interfaces.ContactManager;
@@ -15,6 +17,8 @@ import interfaces.Editor;
 import interfaces.FutureMeeting;
 import interfaces.Meeting;
 import interfaces.PastMeeting;
+
+
 
 /* - ///////////////////////////////////////////////////////
  * 
@@ -33,14 +37,14 @@ public class ContactManagerImpl implements ContactManager {
 	/*
 	 * 1# - CLASS FIELDS & CONTRUCTOR/S		///////////////////////////////////////////
 	 */
-	
-	private EditorImpl editor;						// the editor will fetch and store all information
+
+	private EditorImpl editor;					// the editor will fetch and store all information
 	Comparator<Contact> comparator;				// needed for contacts TreeSet iteration
 	private List<Meeting> meetingList;			// store all meetings
 	private List<PastMeeting> pastMeetingsList;	// store past meetings
 	private Calendar date;	// current date should ALWAYS be updated before use -> updateMgrDate();
 	private Set<Contact> contactsList;				// contact list
-	private static dateComparator dateCmparator;
+	private static meetingDateComparator meetingDateComparator;
 	
 	/* Meetings' and contacts' classes don't manage
 	 * the id assignment and management, hence it needs
@@ -51,7 +55,7 @@ public class ContactManagerImpl implements ContactManager {
 	
 	public ContactManagerImpl()
 	{
-		dateCmparator = new dateComparator(); // for data comparisons
+		meetingDateComparator = new meetingDateComparator(); // for data comparisons
 		date = new GregorianCalendar();		// date at initialization			
 		comparator = new ContactComparator();
 		this.contactsList = new TreeSet<Contact>(comparator);
@@ -166,15 +170,27 @@ public class ContactManagerImpl implements ContactManager {
 	 */
 	private void updateMeetingLists()
 	{
+		// This list will hold all Meetings converted to PastMeetings
+		//
+		List<Meeting> removalList = new LinkedList<Meeting>();
 		updatedMgrDate();
 		for(Meeting meeting : meetingList)
 		{
 			if(meeting.getDate().compareTo(this.date) < 0)
 			{
 				// remove it from meetingList and on pastMeetingList
-				pastMeetingsList.add((PastMeeting)meeting);
-				meetingList.remove(meeting);
+				PastMeeting transferedMeeting = new PastMeetingImpl(meeting.getContacts(), meeting.getDate(), meeting.getId(), "");
+				pastMeetingsList.add(transferedMeeting);
+				removalList.add(meeting); 
 			}		
+		}
+		
+		// Lets remove the meetings from the meetingList if any
+		//
+		if(removalList.isEmpty() == false){
+			for(Meeting meeting : removalList){
+				meetingList.remove(meeting);
+			}
 		}
 	}	// close updateMeetingList(); //
 	
@@ -357,8 +373,23 @@ public class ContactManagerImpl implements ContactManager {
 		
 		return orderListChronologically(returnList);
 	}
+	
+	
 
-	private List<Meeting> orderListChronologically(List<Meeting> returnList) 
+	public List<Meeting> orderListChronologically(List<Meeting> returnList) {
+		
+		TreeSet<Meeting> meetingsTree = new TreeSet<Meeting>(meetingDateComparator);
+		
+		for(Meeting meeting : returnList)
+		{
+			meetingsTree.add(meeting);
+		}
+		returnList.clear();
+		returnList.addAll(meetingsTree);
+		return returnList;
+	}
+
+	private List<Meeting> orderListChronologically0(List<Meeting> returnList) 
 	{
 		// Because the LinkedList does not have a getNext one needs to keep
 		// track of the next Meeting index. In order to compare current with
@@ -492,14 +523,14 @@ public class ContactManagerImpl implements ContactManager {
 		return returnList;
 	}
 	
-	 class dateComparator implements Comparator<Calendar>{
-
+	 class meetingDateComparator implements Comparator<Meeting>
+	 {
 		@Override
-		public int compare(Calendar arg0, Calendar arg1) {
-			if(arg0.getTimeInMillis() == arg1.getTimeInMillis())
+		public int compare(Meeting arg0, Meeting arg1) {
+			if(arg0.getDate().getTimeInMillis() == arg1.getDate().getTimeInMillis())
 			{
 				return 0;
-			}else if(arg0.getTimeInMillis() > arg1.getTimeInMillis()){
+			}else if(arg0.getDate().getTimeInMillis() > arg1.getDate().getTimeInMillis()){
 				return 1;
 			}else{
 				return -1;
