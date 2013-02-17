@@ -487,7 +487,6 @@ public class EditorImpl implements Editor {
 					out = new PrintWriter(new FileWriter(FILENAME, true));
 					
 					// 1 - Process Contacts
-					System.out.println(contacts.isEmpty());
 					if(contacts != null)
 					{
 						for(Contact contact : contacts)
@@ -504,7 +503,6 @@ public class EditorImpl implements Editor {
 							writeMeeting(meeting);
 						}
 					}
-					
 					} catch (FileNotFoundException ex) {
 					// This happens if file does not exist and cannot be created,
 					// or if it exists, but is not writable
@@ -553,10 +551,10 @@ public class EditorImpl implements Editor {
 						writeln(line); // <name>Siddharta Gautama</name>
 						index++;
 					case 3: // <note></note>
-						if(contact.getNotes() != null)
+						if(contact.getNotes() != null || !contact.getNotes().contentEquals(""))
 						{
-							xmlTag = XML_FORMAT.getId();
-							content = String.valueOf(contact.getId());
+							xmlTag = XML_FORMAT.getNote();
+							content = contact.getNotes();
 							line = lineMaker(xmlTag[0], content, xmlTag[1]);
 							writeln(line); // <note>Nice guy!</note>
 						}
@@ -594,7 +592,7 @@ public class EditorImpl implements Editor {
 						index++;
 					case 2: // <date></date>
 						xmlTag = XML_FORMAT.getDate();
-						content = "SOME DATE: FIX ME!!!!!";
+						content = ((MeetingImpl)meeting).dateToString();
 						line = lineMaker(xmlTag[0], content, xmlTag[1]);
 						writeln(line); // <date>09/09/2099</date>
 						index++;
@@ -609,7 +607,18 @@ public class EditorImpl implements Editor {
 						index++;
 					case 4: // <cidList></cidList>
 						xmlTag = XML_FORMAT.getCidlist();
-						writeln(xmlTag[0] + "NEED TO ITERATE OVER CONTACTS AND ADD THEM!!!!" + xmlTag[1]);
+						writeln(xmlTag[0]);
+						Set<Contact> contacts = meeting.getContacts();
+						for(Contact contact : contacts)
+						{
+							xmlTag = XML_FORMAT.cid();
+							content = String.valueOf(contact.getId());
+							line = lineMaker(xmlTag[0], content, xmlTag[1]);
+							writeln(line); // <cid>9</cid>
+
+						}
+						xmlTag = XML_FORMAT.getCidlist();
+						writeln(xmlTag[1]);
 						index++;
 					case 5: // </contact>
 						xmlTag = XML_FORMAT.getMeeting();
