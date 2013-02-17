@@ -161,7 +161,7 @@ public class EditorImpl implements Editor {
 		try {
 			this.out = new PrintWriter(file);
 			
-			this.out.write(this.XML_FORMAT.getSkeleton());
+			// this.out.write(this.XML_FORMAT.getSkeleton());
 		} catch (FileNotFoundException ex) {
 			// This happens if file does not exist and cannot be created,
 			// or if it exists, but is not writable, return false
@@ -485,7 +485,10 @@ public class EditorImpl implements Editor {
 			{
 				try {
 					out = new PrintWriter(new FileWriter(FILENAME, true));
-					
+					String[] xmlTag;
+					writeln(XML_FORMAT.getHeader()); // <?xml ...> <contactManager>
+					xmlTag = XML_FORMAT.getContactList();
+					writeln(xmlTag[0]); // <contactList>
 					// 1 - Process Contacts
 					if(contacts != null)
 					{
@@ -494,7 +497,10 @@ public class EditorImpl implements Editor {
 							writeContact(contact);
 						}
 					}
+					writeln(xmlTag[1]); // </contactList>
 					
+					xmlTag = XML_FORMAT.getMeetingList();
+					writeln(xmlTag[0]); // <contactList>
 					// 2 - Process Meetings
 					if(meetings != null)
 					{
@@ -503,15 +509,18 @@ public class EditorImpl implements Editor {
 							writeMeeting(meeting);
 						}
 					}
-					} catch (FileNotFoundException ex) {
+					writeln(xmlTag[1]); // </contactList>
+					writeln(XML_FORMAT.getFooter()); // </contactManager>
+					
+				} catch (FileNotFoundException ex) {
 					// This happens if file does not exist and cannot be created,
 					// or if it exists, but is not writable
 					System.out.println("Cannot write to file " + file + ".");
-					} catch (IOException ex) {
+				} catch (IOException ex) {
 						ex.printStackTrace();
-					} finally {
+				} finally {
 						out.close();
-					}
+				}
 			}
 			return false;
 		
@@ -611,7 +620,7 @@ public class EditorImpl implements Editor {
 						Set<Contact> contacts = meeting.getContacts();
 						for(Contact contact : contacts)
 						{
-							xmlTag = XML_FORMAT.cid();
+							xmlTag = XML_FORMAT.getCid();
 							content = String.valueOf(contact.getId());
 							line = lineMaker(xmlTag[0], content, xmlTag[1]);
 							writeln(line); // <cid>9</cid>
