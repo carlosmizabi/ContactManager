@@ -109,7 +109,7 @@ public class XmlFormat {
 	private String[] toArray(String element)
 	{
 		String open = "<" + element + ">";
-		String close = "</" + element.substring(1) + "\n";
+		String close = "</" + open.substring(1);
 		String[] array = {open,close};
 		return array;
 	}
