@@ -27,9 +27,13 @@ import interfaces.PastMeeting;
 public class EditorImpl implements Editor {
 	
 	private static final 
-			String FILENAME = "userdata.xml";	// user data file name
+			String FILE_EXTENSION = ".xml";
 	private static final 
-			String TEMP_FILENAME = "temp_userdata.xml";	// user data file name
+			String FILENAME = "userdata" + FILE_EXTENSION;	// user data file name
+	private static final 
+			String TEMP_FILENAME = "temp_userdata" + FILE_EXTENSION;	// user data file name
+	private static final 
+			String BACKUP_FILE_NAME = "_backup_cmgr_userdata" + FILE_EXTENSION;
 	private final static XmlFormat XML_FORMAT = new XmlFormat();
 	private Reader reader;  // inner class - READS FROM user data file
 	private Writer writer;	// inner class - WRITES TO user data file
@@ -47,7 +51,6 @@ public class EditorImpl implements Editor {
 	 * the following format "backup_contactmanager_userdata_*"
 	 */
 	private String backupStatus = "ON";
-	private static final String BACKUP_FILE_NAME = "_backup_cmgr_userdata.xml";
 	
 	/*
 	 * holder of new objects elements (contact or meetings).
@@ -315,26 +318,27 @@ public class EditorImpl implements Editor {
 	 * 
 	 * @param onOff it must either "ON" or "OFF"
 	 * @return string of backup status 
-	 * @throws IllegalArgumentException if the param is null.
+	 * @throws IllegalArgumentException if the @param is null.
 	 */
 	public String setBackup(String onOff)
 	{
-		if(onOff != null);
+		if(onOff != null)
 		{
 			onOff = onOff.toUpperCase();
 			if(onOff.contentEquals("ON") || onOff.contentEquals("OFF")){
 				this.backupStatus = onOff;
+			}else{
+				throw new IllegalArgumentException("The parameter must be either \"ON\" or \"OFF\"");
 			}
 		}else{
-			throw new IllegalArgumentException("The parameter cannot be null");
+			throw new IllegalArgumentException("The parameter cannot be null!");
 		}
 		return this.backupStatus;
 	}
 	
 	@Override
-	public boolean save(Set<Contact> contacts, List<Meeting> meetings) {
-		// TODO Auto-generated method stub
-		
+	public boolean save(Set<Contact> contacts, List<Meeting> meetings) 
+	{	
 		writer.write(contacts, meetings);
 		return false;
 	}
@@ -383,7 +387,7 @@ public class EditorImpl implements Editor {
 			try{
 	//System.out.println("Reading file");  //+++++++++++++++++++++++++++++++++
 				
-				in = new BufferedReader(new FileReader("userdata.xml"));
+				in = new BufferedReader(new FileReader(FILENAME));
 				String line;						// store the line of file being read
 							
 				/* This element will be used by the readerLineProcessor. It needs to 
@@ -532,7 +536,9 @@ public class EditorImpl implements Editor {
 					writeln(XML_FORMAT.getHeader()); // <?xml ...> <contactManager>
 					xmlTag = XML_FORMAT.getContactList();
 					writeln(xmlTag[0]); // <contactList>
+					
 					// 1 - Process Contacts
+					//
 					if(contacts != null)
 					{
 						for(Contact contact : contacts)
@@ -544,7 +550,9 @@ public class EditorImpl implements Editor {
 					
 					xmlTag = XML_FORMAT.getMeetingList();
 					writeln(xmlTag[0]); // <contactList>
+					
 					// 2 - Process Meetings
+					//
 					if(meetings != null)
 					{
 						for(Meeting meeting : meetings)
@@ -694,8 +702,8 @@ public class EditorImpl implements Editor {
 		 */
 		private void saveTempFileAsTheFinalFile()
 		{
-			File old  = new File("userdata.xml");
-			File temp = new File("temp_userdata.xml");
+			File old  = new File(FILENAME);
+			File temp = new File(TEMP_FILENAME);
 			if(getBackupStatus().contentEquals("ON"))
 			{
 				Calendar data = new GregorianCalendar();
