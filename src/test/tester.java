@@ -58,6 +58,7 @@ public class tester {
 		
 		Contact firstContact = null;
 		Set<Contact> contactList = mgr.getContacts(sid);
+		contactList.addAll(mgr.getContacts(sndString));
 		
 		for(Contact contact : contactList)
 		{
@@ -81,6 +82,19 @@ public class tester {
 			}
 		}
 		
+		mgr.flush();
+		
+		ContactManager mgr2 = new ContactManagerImpl();
+		
+		System.out.println(mgr.getMeeting(1).getContacts().toString());
+		mgr.addNewContact("LaLa", "");
+		
+		for(Contact contact : mgr.getContacts(1,2,3))
+		{
+			System.out.println(contact.toString());
+		}
+		
+		mgr.flush();
 		
 //		ContactManagerImpl cmgr = new ContactManagerImpl();
 //		String james = "James T. Kirk";
