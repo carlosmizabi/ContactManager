@@ -292,7 +292,7 @@ public class EditorImpl implements Editor {
 	public boolean save(Set<Contact> contacts, List<Meeting> meetings) {
 		// TODO Auto-generated method stub
 		
-		writer.write();
+		writer.write(contacts, meetings);
 		return false;
 	}
 	
@@ -472,14 +472,13 @@ public class EditorImpl implements Editor {
 	
 	private class Writer{
 		
-		private boolean write()
+		private boolean write(Set<Contact> contacts, List<Meeting> meetings)
 		{
 			// Just to make sure
 			//
 			if(fileExists() == false){
 				makeFile();
 			}
-			
 			// Lets ask again
 			//
 			if(fileExists() == true)
@@ -488,18 +487,19 @@ public class EditorImpl implements Editor {
 					out = new PrintWriter(new FileWriter(FILENAME, true));
 					
 					// 1 - Process Contacts
-					if(contactList.isEmpty() == false)
+					System.out.println(contacts.isEmpty());
+					if(contacts != null)
 					{
-						for(Contact contact : contactList)
+						for(Contact contact : contacts)
 						{
 							writeContact(contact);
 						}
 					}
 					
 					// 2 - Process Meetings
-					if(meetingList.isEmpty() == false)
+					if(meetings != null)
 					{
-						for(Meeting meeting : meetingList)
+						for(Meeting meeting : meetings)
 						{
 							writeMeeting(meeting);
 						}
@@ -608,10 +608,8 @@ public class EditorImpl implements Editor {
 						}
 						index++;
 					case 4: // <cidList></cidList>
-						xmlTag = XML_FORMAT.getDate();
-						writeln(xmlTag[0]);
-						writeln("NEED TO ITERATE OVER CONTACTS AND ADD THEM!!!!");
-						writeln(xmlTag[1]);
+						xmlTag = XML_FORMAT.getCidlist();
+						writeln(xmlTag[0] + "NEED TO ITERATE OVER CONTACTS AND ADD THEM!!!!" + xmlTag[1]);
 						index++;
 					case 5: // </contact>
 						xmlTag = XML_FORMAT.getMeeting();
