@@ -27,6 +27,8 @@ public class EditorImpl implements Editor {
 	
 	private static final 
 	String FILENAME = "userdata.xml";	// user data file name
+	private Reader reader;  // inner class - READS FROM user data file
+	private Writer writer;	// inner class - WRITES TO user data file
 	private File file;
 	private Scanner scanner;
 	private PrintWriter out = null;
@@ -34,6 +36,7 @@ public class EditorImpl implements Editor {
 	private ArrayList<HashMap<String, String>> clipboard;			
 	//
 	// holder of new objects elements (contact or meetings).
+	// used at reading from file.
 	
 	/* REVERSED HASHMAP : the content are the keys of the Map and the 
 	 * xml tags are the value. Though it might sound counter-intuitive
@@ -97,7 +100,8 @@ public class EditorImpl implements Editor {
 	{
 		// is there a xml user date source file? = need method to check
 		//System.out.print(setFile());
-		
+		reader = new Reader();
+		writer = new Writer();
 		setFile();
 		addInitialLists(contacts, meetings, pastMeetings);
 
@@ -111,8 +115,10 @@ public class EditorImpl implements Editor {
 		contacts.addAll(initialContactList);	
 	}
 	
-	/**
-	 * 
+	/*
+	 * It will check if the file exists:
+	 * YES: read it
+	 * NO: make one 
 	 * 
 	 * @return	true if the file already exists or 
 	 * 		   	the result of making the file.
@@ -121,15 +127,14 @@ public class EditorImpl implements Editor {
 	{
 		if(fileExists() == true)
 		{
-			readFile();
+			reader.readFile();
 			return true;
 		}else{
 			return makeFile();
 		}
 	}
 	
-	/**
-	 * 
+	/*
 	 * @return true if user data file exists;
 	 */
 	private boolean fileExists()
@@ -144,7 +149,7 @@ public class EditorImpl implements Editor {
 
 	}
 	
-	/**
+	/*
 	 * 
 	 * @return true if file creation and writing succeeds
 	 */
@@ -168,136 +173,6 @@ public class EditorImpl implements Editor {
 		return true;
 	}
 	
-	/*
-	 * IMPORTANT: The readeFile and related methods needs 
-	 * every xml tag to be on their own line
-	 */
-	private boolean readFile()
-	{
-		try{
-//System.out.println("Reading file");  //+++++++++++++++++++++++++++++++++
-			
-			in = new BufferedReader(new FileReader("userdata.xml"));
-			String line;						// store the line of file being read
-						
-			/* This element will be used by the readerLineProcessor. It needs to 
-			 * be instantiated here because we only need from here on.
-			 */
-			clipboard = new ArrayList<HashMap<String, String>>();	
-			
-			while ((line = in.readLine()) != null) 
-			{
-//System.out.println("going to: readerLineProcessor(line);"); //+++++++++++++++++++++++++++++++++
-				readerLineProcessor(line);
-//System.out.println("back from: readerLineProcessor(line);"); //+++++++++++++++++++++++++++++++++
-			}
-			in.close();
-		}catch(IOException ex)
-		{
-			System.out.println("could not read file");
-			return false;
-		}
-		
-		return true;
-	}
-	
-	/*
-	 * This variables are needed for the readerLineProcessor
-	 * They are instantiated just before the ^ method
-	 */
-	private String  value = "", attribute = "";
-	private Boolean readLines = false;	// sentinel for which lines to read or ignore
-	
-	private void readerLineProcessor(String line)
-	/*
-	 *  Receives each line read and processes it. 
-	 */
-	{
-		if(line.startsWith("<contact>") | line.startsWith("<meeting>"))
-		{
-//System.out.println("Open - line.startsWith"); //+++++++++++++++++++++++++++++++++
-			objectAttributes = new HashMap();	// Create new object of attributes
-			attribute = trimToKey(line);			// trim line to the command
-			objectAttributes.put(attribute, attribute);
-			readLines = true;
-			
-		}else{
-			// Process Lines only after <contact> or <meeting> until they close
-			//
-			if(readLines == true)
-				{
-//System.out.println("readlines : " + readLines); //+++++++++++++++++++++++++++++++++
-				// Xml closing tag
-				//
-				if(line.startsWith("</contact>") | line.startsWith("</meeting>"))
-				{
-//System.out.println("Close - line.startsWith"); //+++++++++++++++++++++++++++++++++
-					clipboard.add(objectAttributes);
-					readLines = false;
-				}else{
-					if(!line.startsWith("</") && !line.startsWith("<cidList>")){
-						value = trimToValue(line);
-//System.out.println("value = trimToValue(line): " + value);
-						attribute = trimToKey(line);
-						objectAttributes.put(value, attribute);
-						value = "";
-						attribute = "";
-					}
-				}
-			}
-		}
-
-	}
-	
-	
-	private String trimToValue(String str)
-	/*
-	* Removes the xml tags
-	* example: "<id>999</id>" -> "999"
-	*/
-	{
-		return (str.replaceAll("<(/)*\\w*>", ""));
-	}
-	
-	private String trimToKey(String str)
-	/*
-	* Trims xml line to open tag only
-	* example: "<id>999</id>" -> "<id>"
-	*/
-	{
-		return str.substring(1, str.indexOf('>'));
-	}
-	
-	/*
-	 * After the file has been read it is time to
-	 * fill the client list with their respective objects
-	 * IMPORTANT!! First the contacts and after the Meetings
-	 * WHY? Because the Meetings have sets of contacts and 
-	 * the contactList will supply them. 
-	 */
-	private void objectGenerator()
-	{
-		// Iterate over each and call the appropriate creator method
-		//System.out.println("objectGenerator()"); //+++++++++++++++++++++++++++++++++++++++++++++++
-		for(int i = 0; i < clipboard.size(); i++)
-		{
-			// using a temp hashmap already defined in class
-			// 
-			objectAttributes = clipboard.get(i);
-			
-			if(objectAttributes.containsValue("contact"))
-			{
-				//System.out.println("Its a Contact"); //+++++++++++++++++++++++++++++++++++++++++++++++
-				addContact(objectAttributes);
-			}else if(objectAttributes.containsValue("meeting"))
-			{
-				//System.out.println("Its a meeting"); //+++++++++++++++++++++++++++++++++++++++++++++++
-				addMeeting(objectAttributes);
-			}
-			
-		}
-	}
-	
 	private void addContact(HashMap<String, String> contactHashMap)
 	{
 		//System.out.println("Its a Contact"); //+++++++++++++++++++++++++++++++++++++++++++++++
@@ -315,7 +190,7 @@ public class EditorImpl implements Editor {
 				note += "\n" + entry.getKey();
 			}else if(entry.getValue().equals("id"))
 			{
-				System.out.println(value);
+				//System.out.println(value);
 				id = Integer.parseInt(entry.getKey());
 			}
 		}
@@ -442,5 +317,162 @@ public class EditorImpl implements Editor {
 //		}
 //		
 //	}
+	
+	/*////////////////////////////////////////////////////////////////////
+	 *  
+	 *  Reader inner class reads data from the userdata file. 
+	 *  
+	 *////////////////////////////////////////////////////////////////////
+	
+	private class Reader{
+		
+		private Reader(){
+			// empty constructor
+		}
+		
+		/*
+		 * IMPORTANT: The readeFile and related methods needs 
+		 * every xml tag to be on their own line
+		 */
+		private boolean readFile()
+		{
+			try{
+	//System.out.println("Reading file");  //+++++++++++++++++++++++++++++++++
+				
+				in = new BufferedReader(new FileReader("userdata.xml"));
+				String line;						// store the line of file being read
+							
+				/* This element will be used by the readerLineProcessor. It needs to 
+				 * be instantiated here because we only need from here on.
+				 */
+				clipboard = new ArrayList<HashMap<String, String>>();	
+				
+				while ((line = in.readLine()) != null) 
+				{
+	//System.out.println("going to: readerLineProcessor(line);"); //+++++++++++++++++++++++++++++++++
+					readerLineProcessor(line);
+	//System.out.println("back from: readerLineProcessor(line);"); //+++++++++++++++++++++++++++++++++
+				}
+				in.close();
+			}catch(IOException ex)
+			{
+				System.out.println("could not read file");
+				return false;
+			}
+			
+			return true;
+		}
+		
+		/*
+		 * This variables are needed for the readerLineProcessor
+		 * They are instantiated just before the ^ method
+		 */
+		private String  value = "", attribute = "";
+		private Boolean readLines = false;	// sentinel for which lines to read or ignore
+		
+		private void readerLineProcessor(String line)
+		/*
+		 *  Receives each line read and processes it. 
+		 */
+		{
+			if(line.startsWith("<contact>") | line.startsWith("<meeting>"))
+			{
+	//System.out.println("Open - line.startsWith"); //+++++++++++++++++++++++++++++++++
+				objectAttributes = new HashMap();	// Create new object of attributes
+				attribute = trimToKey(line);			// trim line to the command
+				objectAttributes.put(attribute, attribute);
+				readLines = true;
+				
+			}else{
+				// Process Lines only after <contact> or <meeting> until they close
+				//
+				if(readLines == true)
+					{
+	//System.out.println("readlines : " + readLines); //+++++++++++++++++++++++++++++++++
+					// Xml closing tag
+					//
+					if(line.startsWith("</contact>") | line.startsWith("</meeting>"))
+					{
+	//System.out.println("Close - line.startsWith"); //+++++++++++++++++++++++++++++++++
+						clipboard.add(objectAttributes);
+						readLines = false;
+					}else{
+						if(!line.startsWith("</") && !line.startsWith("<cidList>")){
+							value = trimToValue(line);
+	//System.out.println("value = trimToValue(line): " + value);
+							attribute = trimToKey(line);
+							objectAttributes.put(value, attribute);
+							value = "";
+							attribute = "";
+						}
+					}
+				}
+			}
+
+		}
+		
+		
+		private String trimToValue(String str)
+		/*
+		* Removes the xml tags
+		* example: "<id>999</id>" -> "999"
+		*/
+		{
+			return (str.replaceAll("<(/)*\\w*>", ""));
+		}
+		
+		private String trimToKey(String str)
+		/*
+		* Trims xml line to open tag only
+		* example: "<id>999</id>" -> "<id>"
+		*/
+		{
+			return str.substring(1, str.indexOf('>'));
+		}
+		
+		/*
+		 * After the file has been read (to the clipboard) it is time to
+		 * fill the client list with their respective objects
+		 * IMPORTANT!! First the contacts and after the Meetings
+		 * WHY? Because the Meetings have sets of contacts and 
+		 * the contactList will supply them. 
+		 */
+		private void objectGenerator()
+		{
+			// Iterate over each and call the appropriate creator method
+			//System.out.println("objectGenerator()"); //+++++++++++++++++++++++++++++++++++++++++++++++
+			for(int i = 0; i < clipboard.size(); i++)
+			{
+				// using a temp hashmap already defined in class
+				// 
+				objectAttributes = clipboard.get(i);
+				
+				if(objectAttributes.containsValue("contact"))
+				{
+					//System.out.println("Its a Contact"); //+++++++++++++++++++++++++++++++++++++++++++++++
+					addContact(objectAttributes);
+				}else if(objectAttributes.containsValue("meeting"))
+				{
+					//System.out.println("Its a meeting"); //+++++++++++++++++++++++++++++++++++++++++++++++
+					addMeeting(objectAttributes);
+				}
+				
+			}
+		}
+		
+	}
+	
+	
+	/*////////////////////////////////////////////////////////////////////
+	 *  
+	 *  Writer inner class writes data to the file. 
+	 *  
+	 *////////////////////////////////////////////////////////////////////
+	
+	private class Writer{
+		
+		
+		
+	}
 
 }
