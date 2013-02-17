@@ -67,6 +67,16 @@ public class MeetingImpl implements Meeting {
 	}
 	
 	/**
+	 * dateToString
+	 * @return a string with the the date with the format dd/MM/yy
+	 */
+	public String dateToString()
+	{
+		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yy");
+		return df.format(this.meetDate.getTime());
+	}
+	
+	/**
 	 * toString
 	 * @return a string with the Meeting Id an the date of the meeting
 	 */
