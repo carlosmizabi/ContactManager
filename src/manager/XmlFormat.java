@@ -12,21 +12,12 @@ package manager;
 
 public class XmlFormat {
 	
-	private static final String xmlSkeleton = 	
-			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" 
-			+
-			"<contactManager>\n"
-			+		
-			"<contactList>\n"
-			+			
-			"</contactList>\n"
-			+
-			"<meetingList>\n"
-			+		
-			"</meetingList>\n"
-			+
-			"</contactManager>\n";
-
+	private static final String OPEN = "<";
+	private static final String CLOSE = ">";
+	private static final String HEADER = "?xml version=\"1.0\" encoding=\"UTF-8\"?";
+	private static final String CONTACT_MANAGER = "contactManager";
+	private static final String CONTACT_LIST = "contactList";
+	private static final String MEETING_LIST = "meetingList";
 	private static final String CONTACT = "contact";
 	private static final String MEETING = "meeting";
 	private static final String NAME = "name";
@@ -36,7 +27,41 @@ public class XmlFormat {
 	private static final String TEXT = "text";
 	private static final String CIDLIST = "cidlist";
 	private static final String CID = "cid";
-			
+	private static final String xmlSkeleton = 	
+			OPEN + HEADER + CLOSE + "\n" + 
+			OPEN + CONTACT_MANAGER + CLOSE + "\n" + 
+			OPEN + CONTACT_LIST + CLOSE + "\n" +  OPEN + "/" + CONTACT_LIST + CLOSE + "\n" +
+			OPEN + MEETING_LIST + CLOSE + "\n" +  "/" + MEETING_LIST + CLOSE + "\n" + 
+			OPEN + "/" + CONTACT_MANAGER + CLOSE + "\n";
+	
+	/**
+	 * @return the header
+	 */
+	public String[] getHeader() {
+		return toArray(HEADER);
+	}
+
+	/**
+	 * @return the contactManager
+	 */
+	public String[] getContactManager() {
+		return toArray(CONTACT_MANAGER);
+	}
+
+	/**
+	 * @return the contactList
+	 */
+	public String[] getContactList() {
+		return toArray(CONTACT_LIST);
+	}
+
+	/**
+	 * @return the meetingList
+	 */
+	public String[] getMeetingList() {
+		return toArray(MEETING_LIST);
+	}
+
 	
 	/**
 	 * @return the contact
@@ -97,7 +122,7 @@ public class XmlFormat {
 	/**
 	 * @return the cid
 	 */
-	public String[] cid() {
+	public String[] getCid() {
 		return toArray(CID);
 	}
 
@@ -106,7 +131,7 @@ public class XmlFormat {
 		return xmlSkeleton;
 	}
 	  
-	private String[] toArray(String element)
+	private static String[] toArray(String element)
 	{
 		String open = "<" + element + ">";
 		String close = "</" + open.substring(1);
