@@ -35,17 +35,18 @@ public class XmlFormat {
 			OPEN + "/" + CONTACT_MANAGER + CLOSE + "\n";
 	
 	/**
-	 * @return the header
+	 * @return <?xml ....> \n <contactManager>
 	 */
-	public String[] getHeader() {
-		return toArray(HEADER);
+	public String getHeader(){
+		return OPEN + HEADER + CLOSE + "\n" + 
+				OPEN + CONTACT_MANAGER + CLOSE;
 	}
-
+	
 	/**
-	 * @return the contactManager
+	 * @return </contactManager>
 	 */
-	public String[] getContactManager() {
-		return toArray(CONTACT_MANAGER);
+	public String getFooter(){
+		return OPEN + "/" + CONTACT_MANAGER + CLOSE;
 	}
 
 	/**
