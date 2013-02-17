@@ -486,8 +486,13 @@ public class EditorImpl implements Editor {
 			{
 				try {
 					out = new PrintWriter(new FileWriter(FILENAME, true));
-					String[] xmlContact = XML_FORMAT.getContact();
-					writeln(xmlContact[0]);
+					
+					// 1 - Process Contacts
+					
+					
+					
+					// 2 - Process Meetings
+					
 					} catch (FileNotFoundException ex) {
 					// This happens if file does not exist and cannot be created,
 					// or if it exists, but is not writable
@@ -516,7 +521,7 @@ public class EditorImpl implements Editor {
 			String[] xmlTag;
 			String content,line;
 			int index = 0;
-			for(int i = 0; i < 4; i++)
+			for(int i = 0; i <= 4; i++)
 			{
 				switch(index){
 					case 0:	// <contact>
@@ -524,16 +529,16 @@ public class EditorImpl implements Editor {
 						writeln(xmlTag[0]);
 						index++;
 					case 1: // <id></id>
-						xmlTag = XML_FORMAT.getName();
-						content = contact.getName();
-						line = lineMaker(xmlTag[0], content, xmlTag[1]);
-						writeln(line); // id: 001
-						index++;
-					case 2: // <name></name>
 						xmlTag = XML_FORMAT.getId();
 						content = String.valueOf(contact.getId());
 						line = lineMaker(xmlTag[0], content, xmlTag[1]);
-						writeln(line); // id: 001
+						writeln(line); // <id>9</id>
+						index++;
+					case 2: // <name></name>
+						xmlTag = XML_FORMAT.getName();
+						content = contact.getName();
+						line = lineMaker(xmlTag[0], content, xmlTag[1]);
+						writeln(line); // <name>Siddharta Gautama</name>
 						index++;
 					case 3: // <note></note>
 						if(contact.getNotes() != null)
@@ -541,27 +546,30 @@ public class EditorImpl implements Editor {
 							xmlTag = XML_FORMAT.getId();
 							content = String.valueOf(contact.getId());
 							line = lineMaker(xmlTag[0], content, xmlTag[1]);
-							writeln(line); // id: 001
+							writeln(line); // <note>Nice guy!</note>
 						}
 						index++;
 					case 4: // </contact>
 						xmlTag = XML_FORMAT.getContact();
-						writeln(xmlTag[1]);
+						writeln(xmlTag[1]); 
 						index++;
+					default:
+						break;
 				} // Closes Switch() //
 			} // Closes for() // 
 		} // Closes writeContact() //
 		
 		private void writeMeeting(Meeting meeting)
 		//
-		// Extract and write to file a contact
+		// Extract and write to file a meeting
 		{
 			String[] xmlTag;
 			String content,line;
 			int index = 0;
-			for(int i = 0; i < 4; i++)
+			for(int i = 0; i <= 4; i++)
 			{
-				switch(index){
+				switch(index)
+				{  // I like brackets so, tough!
 					case 0:	// <meeting>
 						xmlTag = XML_FORMAT.getMeeting();
 						writeln(xmlTag[0]);
@@ -570,10 +578,13 @@ public class EditorImpl implements Editor {
 						xmlTag = XML_FORMAT.getId();
 						content = String.valueOf(meeting.getId());
 						line = lineMaker(xmlTag[0], content, xmlTag[1]);
-						writeln(line); // <id></id>
+						writeln(line); // <id>9</id>
 						index++;
 					case 2: // <date></date>
-						
+						xmlTag = XML_FORMAT.getDate();
+						content = "SOME DATE: FIX ME!!!!!";
+						line = lineMaker(xmlTag[0], content, xmlTag[1]);
+						writeln(line); // <date>09/09/2099</date>
 						index++;
 					case 3: // <text></text>
 						if(meeting instanceof PastMeetingImpl)
@@ -581,13 +592,21 @@ public class EditorImpl implements Editor {
 							xmlTag = XML_FORMAT.getText();
 							content = ((PastMeeting)meeting).getNotes();
 							line = lineMaker(xmlTag[0], content, xmlTag[1]);
-							writeln(line); // 
+							writeln(line); // <text>Very Long Meeting!</text>
 						}
 						index++;
-					case 4: // </contact>
+					case 4: // <cidList></cidList>
+						xmlTag = XML_FORMAT.getDate();
+						writeln(xmlTag[0]);
+						writeln("NEED TO ITERATE OVER CONTACTS AND ADD THEM!!!!");
+						writeln(xmlTag[1]);
+						index++;
+					case 5: // </contact>
 						xmlTag = XML_FORMAT.getMeeting();
 						writeln(xmlTag[1]);
 						index++;
+					default:
+						break;
 				} // Closes Switch() //
 			} // Closes for() // 
 		} // Closes writeContact() //
