@@ -461,7 +461,7 @@ public class EditorImpl implements Editor {
 			}
 		}
 		
-	} // Closes class Reader{}
+	} // Closes class Reader{} //
 	
 	
 	/*////////////////////////////////////////////////////////////////////
@@ -487,7 +487,7 @@ public class EditorImpl implements Editor {
 				try {
 					out = new PrintWriter(new FileWriter(FILENAME, true));
 					String[] xmlContact = XML_FORMAT.getContact();
-					out.println(xmlContact[0]);
+					writeln(xmlContact[0]);
 					} catch (FileNotFoundException ex) {
 					// This happens if file does not exist and cannot be created,
 					// or if it exists, but is not writable
@@ -500,8 +500,14 @@ public class EditorImpl implements Editor {
 			}
 			return false;
 		
+		} // Closes write  //
+		
+		private void writeln(String line)
+		// write a line to the file
+		{
+			out.println(line);
 		}
 		
-	} // Closes class Writer{}
+	} // Closes class Writer{} //
 
-} // Closes class EditorImpl{}
+} // Closes class EditorImpl{} //
