@@ -46,7 +46,7 @@ public class EditorImpl implements Editor {
 	 * delete backups is provided that will erase all files with
 	 * the following format "backup_contactmanager_userdata_*"
 	 */
-	private String backupStatus = "OFF";
+	private String backupStatus = "ON";
 	private static final String BACKUP_FILE_NAME = "_backup_cmgr_userdata.xml";
 	
 	/*
@@ -315,6 +315,7 @@ public class EditorImpl implements Editor {
 	 * 
 	 * @param onOff it must either "ON" or "OFF"
 	 * @return string of backup status 
+	 * @throws IllegalArgumentException if the param is null.
 	 */
 	public String setBackup(String onOff)
 	{
@@ -324,6 +325,8 @@ public class EditorImpl implements Editor {
 			if(onOff.contentEquals("ON") || onOff.contentEquals("OFF")){
 				this.backupStatus = onOff;
 			}
+		}else{
+			throw new IllegalArgumentException("The parameter cannot be null");
 		}
 		return this.backupStatus;
 	}
@@ -691,11 +694,18 @@ public class EditorImpl implements Editor {
 		 */
 		private void saveTempFileAsTheFinalFile()
 		{
+			File old  = new File("userdata.xml");
+			File temp = new File("temp_userdata.xml");
 			if(getBackupStatus().contentEquals("ON"))
 			{
-				
+				Calendar data = new GregorianCalendar();
+				String milliseconds = String.valueOf(data.getTimeInMillis());
+				String newName = milliseconds + BACKUP_FILE_NAME;
+				old.renameTo( new File(newName));
+				temp.renameTo(old);
 			}else{
-				
+				old.delete();
+				temp.renameTo(old);
 			}
 		}
 		
