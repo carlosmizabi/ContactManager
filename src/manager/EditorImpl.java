@@ -503,9 +503,98 @@ public class EditorImpl implements Editor {
 		} // Closes write  //
 		
 		private void writeln(String line)
-		// write a line to the file
+		//
+		// writes a line to the file
 		{
 			out.println(line);
+		}
+		
+		private void writeContact(Contact contact)
+		//
+		// Extract and write to file a contact
+		{
+			String[] xmlTag;
+			String content,line;
+			int index = 0;
+			for(int i = 0; i < 4; i++)
+			{
+				switch(index){
+					case 0:	// <contact>
+						xmlTag = XML_FORMAT.getContact();
+						writeln(xmlTag[0]);
+						index++;
+					case 1: // <id></id>
+						xmlTag = XML_FORMAT.getName();
+						content = contact.getName();
+						line = lineMaker(xmlTag[0], content, xmlTag[1]);
+						writeln(line); // id: 001
+						index++;
+					case 2: // <name></name>
+						xmlTag = XML_FORMAT.getId();
+						content = String.valueOf(contact.getId());
+						line = lineMaker(xmlTag[0], content, xmlTag[1]);
+						writeln(line); // id: 001
+						index++;
+					case 3: // <note></note>
+						if(contact.getNotes() != null)
+						{
+							xmlTag = XML_FORMAT.getId();
+							content = String.valueOf(contact.getId());
+							line = lineMaker(xmlTag[0], content, xmlTag[1]);
+							writeln(line); // id: 001
+						}
+						index++;
+					case 4: // </contact>
+						xmlTag = XML_FORMAT.getContact();
+						writeln(xmlTag[1]);
+						index++;
+				} // Closes Switch() //
+			} // Closes for() // 
+		} // Closes writeContact() //
+		
+		private void writeMeeting(Meeting meeting)
+		//
+		// Extract and write to file a contact
+		{
+			String[] xmlTag;
+			String content,line;
+			int index = 0;
+			for(int i = 0; i < 4; i++)
+			{
+				switch(index){
+					case 0:	// <meeting>
+						xmlTag = XML_FORMAT.getMeeting();
+						writeln(xmlTag[0]);
+						index++;
+					case 1: // <id></id>
+						xmlTag = XML_FORMAT.getId();
+						content = String.valueOf(meeting.getId());
+						line = lineMaker(xmlTag[0], content, xmlTag[1]);
+						writeln(line); // <id></id>
+						index++;
+					case 2: // <date></date>
+						
+						index++;
+					case 3: // <text></text>
+						if(meeting instanceof PastMeetingImpl)
+						{
+							xmlTag = XML_FORMAT.getText();
+							content = ((PastMeeting)meeting).getNotes();
+							line = lineMaker(xmlTag[0], content, xmlTag[1]);
+							writeln(line); // 
+						}
+						index++;
+					case 4: // </contact>
+						xmlTag = XML_FORMAT.getMeeting();
+						writeln(xmlTag[1]);
+						index++;
+				} // Closes Switch() //
+			} // Closes for() // 
+		} // Closes writeContact() //
+		
+		private String lineMaker(String open, String content, String close)
+		{
+			return open + content + close;
 		}
 		
 	} // Closes class Writer{} //
