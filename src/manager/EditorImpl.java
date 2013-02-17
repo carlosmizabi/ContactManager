@@ -27,7 +27,7 @@ import interfaces.PastMeeting;
 public class EditorImpl implements Editor {
 	
 	private static final 
-			String FILE_EXTENSION = ".xml";
+			String FILE_EXTENSION = ".txt";
 	private static final 
 			String FILENAME = "userdata" + FILE_EXTENSION;	// user data file name
 	private static final 
