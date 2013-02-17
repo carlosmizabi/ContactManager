@@ -28,6 +28,8 @@ public class EditorImpl implements Editor {
 	
 	private static final 
 			String FILENAME = "userdata.xml";	// user data file name
+	private static final 
+			String TEMP_FILENAME = "temp_userdata.xml";	// user data file name
 	private final static XmlFormat XML_FORMAT = new XmlFormat();
 	private Reader reader;  // inner class - READS FROM user data file
 	private Writer writer;	// inner class - WRITES TO user data file
@@ -35,10 +37,23 @@ public class EditorImpl implements Editor {
 	private Scanner scanner;
 	private PrintWriter out = null;
 	private BufferedReader in = null;
-	private ArrayList<HashMap<String, String>> clipboard;			
-	//
-	// holder of new objects elements (contact or meetings).
-	// used at reading from file.
+	
+	/*
+	 * This tells the editor to keep backups of all files when changes
+	 * are saved (flushed).
+	 * By default it is "OFF". If the client 
+	 * decides to turn it "ON" then it must manage these files. A
+	 * delete backups is provided that will erase all files with
+	 * the following format "backup_contactmanager_userdata_*"
+	 */
+	private String backupStatus = "OFF";
+	private static final String BACKUP_FILE_NAME = "_backup_cmgr_userdata.xml";
+	
+	/*
+	 * holder of new objects elements (contact or meetings).
+	 * Used at reading from file.
+	 */
+	private ArrayList<HashMap<String, String>> clipboard;	
 	
 	/* REVERSED HASHMAP : the content are the keys of the Map and the 
 	 * xml tags are the value. Though it might sound counter-intuitive
@@ -160,7 +175,6 @@ public class EditorImpl implements Editor {
 		file = new File(FILENAME);
 		try {
 			this.out = new PrintWriter(file);
-			
 			// this.out.write(this.XML_FORMAT.getSkeleton());
 		} catch (FileNotFoundException ex) {
 			// This happens if file does not exist and cannot be created,
@@ -286,6 +300,32 @@ public class EditorImpl implements Editor {
 		
 		int[] date = {year, month, day};
 		return date;
+	}
+	
+	/**
+	 * 
+	 * @return string of backup status "ON" or "OFF"
+	 */
+	public String getBackupStatus()
+	{
+		return this.backupStatus;
+	}
+	
+	/**
+	 * 
+	 * @param onOff it must either "ON" or "OFF"
+	 * @return string of backup status 
+	 */
+	public String setBackup(String onOff)
+	{
+		if(onOff != null);
+		{
+			onOff = onOff.toUpperCase();
+			if(onOff.contentEquals("ON") || onOff.contentEquals("OFF")){
+				this.backupStatus = onOff;
+			}
+		}
+		return this.backupStatus;
 	}
 	
 	@Override
@@ -484,7 +524,7 @@ public class EditorImpl implements Editor {
 			if(fileExists() == true)
 			{
 				try {
-					out = new PrintWriter(new FileWriter(FILENAME, true));
+					out = new PrintWriter(new FileWriter(TEMP_FILENAME, false));
 					String[] xmlTag;
 					writeln(XML_FORMAT.getHeader()); // <?xml ...> <contactManager>
 					xmlTag = XML_FORMAT.getContactList();
@@ -511,7 +551,7 @@ public class EditorImpl implements Editor {
 					}
 					writeln(xmlTag[1]); // </contactList>
 					writeln(XML_FORMAT.getFooter()); // </contactManager>
-					
+					saveTempFileAsTheFinalFile();
 				} catch (FileNotFoundException ex) {
 					// This happens if file does not exist and cannot be created,
 					// or if it exists, but is not writable
@@ -642,6 +682,21 @@ public class EditorImpl implements Editor {
 		private String lineMaker(String open, String content, String close)
 		{
 			return open + content + close;
+		}
+		
+		/*
+		 * This method will take the new file with the user information and 
+		 * and make it the final file. It will turn the old file into a
+		 * backup file if the backupStatus is set to "ON".
+		 */
+		private void saveTempFileAsTheFinalFile()
+		{
+			if(getBackupStatus().contentEquals("ON"))
+			{
+				
+			}else{
+				
+			}
 		}
 		
 	} // Closes class Writer{} //
